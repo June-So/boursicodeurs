@@ -6,6 +6,7 @@ Modèle de prédiction de tendance boursière
 ### Téléchargement 
 ```
  git clone https://github.com/June-So/boursicodeurs.git
+ cd boursicodeurs
 ```
 ### Création de l'envrionnement virtuel
 ``` 
