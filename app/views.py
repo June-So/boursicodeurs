@@ -7,7 +7,7 @@ from SECRET import *
 @app.route('/')
 def index():
     # connection API fxcmpy
-    con_fxcmpy = fxcmpy.fxcmpy(ACCESS_TOKEN, server='demo')
+    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
     # list of instruments, generate choice for get data in view
     instruments = con_fxcmpy.get_instruments()
@@ -22,7 +22,7 @@ def get_data(instrument):
     :return: json of data for instrument
     """
     # connection API fxcmpy
-    con_fxcmpy = fxcmpy.fxcmpy(ACCESS_TOKEN, server='demo')
+    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
     # search params GET for get candle
     params_candle = request.args.to_dict()
