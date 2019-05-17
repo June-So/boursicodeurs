@@ -12,6 +12,6 @@ Modèle de prédiction de tendance boursière
 ``` 
  python -m venv venv 
  venv\Scripts\activate
- pip install requirements.txt
+ pip install --upgrade -r requirements.txt
 ```
 
