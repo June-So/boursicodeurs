@@ -2,15 +2,13 @@ import mysql.connector
 import pandas as pd
 from sqlalchemy import create_engine
 import fxcmpy
+from SECRET import *
 
-access_token = "7c7c08f0a2649e610b1e2ad45482ae6614085659"
-#access_token  = "f7c7d05290f290e1618ff6b68e47d8dd284f1c17"
-con = fxcmpy.fxcmpy(access_token, server='real')
+con = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='real')
 
 df = con.get_candles('GER30', period='H1', number=10000)
 #df.reset_index()
-
-engine = create_engine('mysql+mysqldb://root:dikocy89@127.0.0.1:3306/assets?charset=utf8mb4')
+engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{database}?charset=utf8mb4'.format(**DATABASE))
 
 #df.to_sql(name='assets_tables',con=engine , if_exists='append', index=False)
 

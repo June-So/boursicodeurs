@@ -14,4 +14,5 @@ Modèle de prédiction de tendance boursière
  venv\Scripts\activate
  pip install --upgrade -r requirements.txt
 ```
-
+### Configuration
+- Modifiez le fichier `SECRET.py`  avec vos informations de connexion (token Fxcm, identifiant base ded onnées).
