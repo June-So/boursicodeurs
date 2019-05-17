@@ -2,4 +2,9 @@
 {% block body %}
     <h1>Boursicodeurs</h1>
     <p>Site en construction</p>
+    <div>
+        {% for instrument in instruments %}
+            <a href="{{ url_for('get_data', instrument=instrument, period='D1', number=2600)}}">{{ instrument }}</a>
+        {% endfor %}
+    </div>
 {% endblock %}
