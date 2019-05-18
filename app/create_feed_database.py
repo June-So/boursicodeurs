@@ -13,7 +13,7 @@ engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{datab
 #df.to_sql(name='assets_tables',con=engine , if_exists='append', index=False)
 
 # Création et remplissage de la table assets_tables avec le dataframe des données.
-df.to_sql(name='assets_tables', con=engine, if_exists='replace')
+#df.to_sql(name='assets_tables', con=engine, if_exists='replace')
 
 
 #connection = engine.connect()
@@ -34,6 +34,3 @@ table_pred = engine.execute("""CREATE TABLE IF NOT EXISTS assets_forecast (
   REFERENCES assets_tables (`date`) ON DELETE CASCADE
 );""")
 table_pred.close()
-#for e in r:
-#    print(e)
-#resultat.close()
