@@ -3,6 +3,7 @@ from flask import render_template, request
 import fxcmpy
 import pandas as pd
 from SECRET import *
+from sqlalchemy import create_engine
 
 
 @app.route('/')
@@ -32,6 +33,9 @@ def get_data(instrument):
 
     # get data from api, use GET params
     data = con_fxcmpy.get_candles(instrument, **params_candle)
+    con_fxcmpy.close()
+
+    data = actualize_data(data)
 
     # stock data in csv
     filename = 'bourse_' + instrument + '.csv'
@@ -40,19 +44,12 @@ def get_data(instrument):
     return data.to_json()
 
 
-def actualize_data():
+def actualize_data(data):
     """
     la fonction va récuper les dernieres données de l'API,
     et ensuite les append dans la table assets_tables
     de la base de données.
     """
-    # connection API fxcmpy
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
-
-    #récupération des donnée
-    data = con.get_candles('GER30', period='H1', number=10000)
-    con_fxcmpy.close()
-
     last_value_df = data.tail(1)
 
     engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{database}?charset=utf8mb4'.format(**DATABASE))
@@ -71,3 +68,5 @@ def actualize_data():
 
         ecart_df.to_sql(name='assets_tables', con=engine, if_exists='append')
         print("{} row(s) ont été rajoutée(s) à la table assets_tables".format(len(ecart_df)))
+
+    return data
