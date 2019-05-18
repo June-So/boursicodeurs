@@ -1,9 +1,11 @@
 from app import app
-from flask import render_template, request
+from flask import render_template, request, flash, redirect, url_for
 import fxcmpy
 import pandas as pd
 from SECRET import *
 from sqlalchemy import create_engine
+
+import app.ScriptModel as script_model
 
 
 @app.route('/')
@@ -42,6 +44,30 @@ def get_data(instrument):
     data.to_csv('app/data/' + filename)
 
     return data.to_json()
+
+
+@app.route('/train-model')
+def train_model():
+    """ entraîne le modèle sur les donnèes existantes
+        effectue une sauvegarde du model
+    """
+    model = script_model.train_model()
+    flash('Le modèle à bien été entraîné')
+    return redirect(url_for('index'))
+
+
+@app.route('/get-predict')
+def get_predict():
+    """ Prédiction du modèle """
+    model_name = 'modelDAX_Hour0.hdf5'
+    # récupère toutes les données
+    data = script_model.get_data_on_db()
+
+    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, model_name)
+
+    print(zip(inputs_pred_ds, real_input_ds))
+    flash('Le modèleà discuter avec lui-même et a fais c\'est prédictions' )
+    return redirect(url_for('index'))
 
 
 def actualize_data(data):

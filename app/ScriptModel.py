@@ -91,7 +91,7 @@ def make_timeseries(mat):
 
 
 
-def build_model():
+def build_model(shape):
 
     # intilialiser le RNN
     regressor = Sequential()
@@ -100,7 +100,7 @@ def build_model():
     # units : nombre de neuronnes pour cette couche en particulier -> capturer la tendance du cours d'une action donc nombre neuronnes conséquent
     # return_sequences = accumuler des couches LSTM pour des meilleurs résultats -> True
     # input_shape = longueur du premier vecteur
-    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 9)))
+    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (shape[1], 9)))
     # Pour diminuer les risques de surentrainements
     # Désactiver des neuronnes de façon aléatoire avec une probabilité
     regressor.add(Dropout(0.2))
@@ -133,13 +133,13 @@ def build_model():
 
 
 
-def fit_model(X_train, y_train, X_valid, y_valid, modif):
+def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
     """la variable modif permet de pas écrasser après modification,
      le model entrainé précédement"""
 
-    filename = 'modelDAX_Hour'+modif+'.hdf5'
+    filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
-    regressor_trained = build_model()
+    regressor_trained = build_model(X_train.shape)
     regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = backsize, validation_data = (X_valid, y_valid),
                 callbacks=[checkpoint])
 
@@ -172,7 +172,7 @@ def make_inputs(mat):
     return X, y
 
 
-def make_prediction(data):
+def make_prediction(data, model_name):
     previousDays = len(data) - time_steps
 
 
@@ -186,6 +186,8 @@ def make_prediction(data):
     #X_inputs, y_inputs = make_timeseries(inputs_sc)
     X_inputs, y_inputs = make_inputs(inputs_sc)
 
+    # chargement du model
+    loaded_model(model_name)
     #X_inputs, y_inputs =
 
     # faire la prédiction
@@ -198,7 +200,7 @@ def make_prediction(data):
 
 
 
-def train_model(data):
+def train_model():
     """this function allowed to train model"""
     data = get_data_on_db()
 
