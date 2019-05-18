@@ -30,7 +30,7 @@ def get_data(instrument):
         params_candle['number'] = int(params_candle['number'])
 
     # get data from api, use GET params
-    data = con_fxcmpy.get_candles(instrument, params_candle)
+    data = con_fxcmpy.get_candles(instrument, **params_candle)
 
     # stock data in csv
     filename = 'bourse_' + instrument + '.csv'
