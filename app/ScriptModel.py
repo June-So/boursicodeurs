@@ -35,7 +35,7 @@ def get_data_on_db():
     """
         get data for database in format csv
     """
-    engine = create_engine('mysql+mysqldb://root:dikocy89@127.0.0.1:3306/assets?charset=utf8mb4')
+    engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{database}?charset=utf8mb4'.format(**DATABASE))
 
     # Récuperer les données de la base de donnée dans un dataframe
     data = pd.read_sql_query("""SELECT * FROM assets_tables;""", engine, index_col='date')
@@ -91,7 +91,7 @@ def make_timeseries(mat):
 
 
 
-def build_model(shape):
+def build_model(X_train):
 
     # intilialiser le RNN
     regressor = Sequential()
@@ -100,7 +100,7 @@ def build_model(shape):
     # units : nombre de neuronnes pour cette couche en particulier -> capturer la tendance du cours d'une action donc nombre neuronnes conséquent
     # return_sequences = accumuler des couches LSTM pour des meilleurs résultats -> True
     # input_shape = longueur du premier vecteur
-    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (shape[1], 9)))
+    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 9)))
     # Pour diminuer les risques de surentrainements
     # Désactiver des neuronnes de façon aléatoire avec une probabilité
     regressor.add(Dropout(0.2))
@@ -139,7 +139,7 @@ def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
 
     filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
-    regressor_trained = build_model(X_train.shape)
+    regressor_trained = build_model(X_train)
     regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = backsize, validation_data = (X_valid, y_valid),
                 callbacks=[checkpoint])
 
