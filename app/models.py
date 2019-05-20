@@ -5,37 +5,43 @@ from flask_sqlalchemy import SQLAlchemy
 from app import db
 
 
-
-
-
-class AssetsForecast(db.Model):
-    __tablename__ = 'assets_forecast'
+class StockPrediction(db.Model):
+    __tablename__ = 'stock_prediction'
 
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.ForeignKey('assets_tables.date', ondelete='CASCADE'), index=True)
-    bidopen_forcast = db.Column(db.Float(asdecimal=True))
-    bidclose_forcast = db.Column(db.Float(asdecimal=True))
-    bidhigh_forcast = db.Column(db.Float(asdecimal=True))
-    bidlow_forcast = db.Column(db.Float(asdecimal=True))
-    askopen_forcast = db.Column(db.Float(asdecimal=True))
-    askclose_forcast = db.Column(db.Float(asdecimal=True))
-    askhigh_forcast = db.Column(db.Float(asdecimal=True))
-    asklow_forcast = db.Column(db.Float(asdecimal=True))
-    tickqty_forcast = db.Column(db.BigInteger)
+    asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
+    date = db.Column(db.DateTime, index=True),
+    bidopen = db.Column(db.Float(asdecimal=True))
+    bidclose = db.Column(db.Float(asdecimal=True))
+    bidhigh = db.Column(db.Float(asdecimal=True))
+    bidlow = db.Column(db.Float(asdecimal=True))
+    askopen = db.Column(db.Float(asdecimal=True))
+    askclose = db.Column(db.Float(asdecimal=True))
+    askhigh = db.Column(db.Float(asdecimal=True))
+    asklow = db.Column(db.Float(asdecimal=True))
+    tickqty = db.Column(db.BigInteger)
 
-    assets_table = db.relationship('AssetsTable', primaryjoin='AssetsForecast.date == AssetsTable.date', backref='assets_forecasts')
+
+class StockHystory(db.Model):
+    __tablename__ = 'stock_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
+    date = db.Column(db.DateTime, index=True),
+    bidopen = db.Column(db.Float(asdecimal=True)),
+    bidclose = db.Column(db.Float(asdecimal=True)),
+    bidhigh = db.Column(db.Float(asdecimal=True)),
+    bidlow = db.Column(db.Float(asdecimal=True)),
+    askopen = db.Column(db.Float(asdecimal=True)),
+    askclose = db.Column(db.Float(asdecimal=True)),
+    askhigh = db.Column(db.Float(asdecimal=True)),
+    asklow = db.Column(db.Float(asdecimal=True)),
+    tickqty = db.Column(db.BigInteger)
 
 
-t_assets_tables = db.Table(
-    'assets_tables',
-    db.Column('date', db.DateTime, index=True),
-    db.Column('bidopen', db.Float(asdecimal=True)),
-    db.Column('bidclose', db.Float(asdecimal=True)),
-    db.Column('bidhigh', db.Float(asdecimal=True)),
-    db.Column('bidlow', db.Float(asdecimal=True)),
-    db.Column('askopen', db.Float(asdecimal=True)),
-    db.Column('askclose', db.Float(asdecimal=True)),
-    db.Column('askhigh', db.Float(asdecimal=True)),
-    db.Column('asklow', db.Float(asdecimal=True)),
-    db.Column('tickqty', db.BigInteger)
-)
+class Asset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    stock_predictions = db.relationship('StockPrediction', backref='asset', cascade="all,delete", lazy=True)
+    stock_historys = db.relationship('StockHystory', backref='asset', cascade="all,delete", lazy=True)
+
