@@ -66,7 +66,7 @@ def get_predict():
     inputs_pred_ds, real_input_ds = script_model.make_prediction(data, model_name)
 
     print(zip(inputs_pred_ds, real_input_ds))
-    flash('Le modèleà discuter avec lui-même et a fais c\'est prédictions' )
+    flash('Prédiction effectuées')
     return redirect(url_for('index'))
 
 
@@ -86,13 +86,17 @@ def actualize_data(data):
                                         DESC LIMIT 1;""", engine, index_col='date')
 
     if last_value_df.index.values == last_value_db.index.values:
-        print("La base de donnée est deja a jour...")
+        flash("La base de donnée est deja a jour...")
+
+    elif last_value_db.empty == True:
+        data.to_sql(name='assets_tables', con=engine, if_exists='append')
+        flash("La base de donnée à reçu ses première observation")
 
     else :
         # On recupère les lignes qui sont supérieurs à la dernière date enrégistré dans la base de données
         ecart_df = data[data.index.values > last_value_db.index.values]
 
         ecart_df.to_sql(name='assets_tables', con=engine, if_exists='append')
-        print("{} row(s) ont été rajoutée(s) à la table assets_tables".format(len(ecart_df)))
+        flash("{} row(s) ont été rajoutée(s) à la table assets_tables".format(len(ecart_df)))
 
     return data
