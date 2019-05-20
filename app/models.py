@@ -1,7 +1,4 @@
 # coding: utf-8
-from sqlalchemy import BigInteger, Column, DateTime, Float, ForeignKey, Integer, Table
-from sqlalchemy.orm import relationship
-from flask_sqlalchemy import SQLAlchemy
 from app import db
 
 
@@ -10,7 +7,7 @@ class StockPrediction(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
-    date = db.Column(db.DateTime, index=True),
+    date = db.Column(db.DateTime, index=True)
     bidopen = db.Column(db.Float(asdecimal=True))
     bidclose = db.Column(db.Float(asdecimal=True))
     bidhigh = db.Column(db.Float(asdecimal=True))
@@ -27,15 +24,15 @@ class StockHystory(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
-    date = db.Column(db.DateTime, index=True),
-    bidopen = db.Column(db.Float(asdecimal=True)),
-    bidclose = db.Column(db.Float(asdecimal=True)),
-    bidhigh = db.Column(db.Float(asdecimal=True)),
-    bidlow = db.Column(db.Float(asdecimal=True)),
-    askopen = db.Column(db.Float(asdecimal=True)),
-    askclose = db.Column(db.Float(asdecimal=True)),
-    askhigh = db.Column(db.Float(asdecimal=True)),
-    asklow = db.Column(db.Float(asdecimal=True)),
+    date = db.Column(db.DateTime, index=True)
+    bidopen = db.Column(db.Float(asdecimal=True))
+    bidclose = db.Column(db.Float(asdecimal=True))
+    bidhigh = db.Column(db.Float(asdecimal=True))
+    bidlow = db.Column(db.Float(asdecimal=True))
+    askopen = db.Column(db.Float(asdecimal=True))
+    askclose = db.Column(db.Float(asdecimal=True))
+    askhigh = db.Column(db.Float(asdecimal=True))
+    asklow = db.Column(db.Float(asdecimal=True))
     tickqty = db.Column(db.BigInteger)
 
 
@@ -44,4 +41,7 @@ class Asset(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     stock_predictions = db.relationship('StockPrediction', backref='asset', cascade="all,delete", lazy=True)
     stock_historys = db.relationship('StockHystory', backref='asset', cascade="all,delete", lazy=True)
+
+    def __init__(self, name):
+        self.name = name
 

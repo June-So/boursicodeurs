@@ -1,10 +1,10 @@
-from app import app
+from app import app, db
 from flask import render_template, request, flash, redirect, url_for
 import fxcmpy
 import pandas as pd
 from SECRET import *
 from sqlalchemy import create_engine
-
+from .models import Asset
 import app.ScriptModel as script_model
 
 
@@ -25,6 +25,14 @@ def get_data(instrument):
     :param instrument: name of instrument for research
     :return: json of data for instrument
     """
+    #get asset
+    asset = Asset.query.filter(Asset.name == instrument).first()
+    print(asset)
+    if not asset:
+        asset = Asset(instrument)
+        db.session.add(asset)
+        db.session.commit()
+
     # connection API fxcmpy
     con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
@@ -35,6 +43,7 @@ def get_data(instrument):
 
     # get data from api, use GET params
     data = con_fxcmpy.get_candles(instrument, **params_candle)
+    data['asset_id'] = asset.id
     con_fxcmpy.close()
 
     data = actualize_data(data)
@@ -81,7 +90,7 @@ def actualize_data(data):
     engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{database}?charset=utf8mb4'.format(**DATABASE))
 
     # on récupère la derniere row inséré dans la base de donnée
-    last_value_db = pd.read_sql_query("""SELECT * from assets_tables
+    last_value_db = pd.read_sql_query("""SELECT * from stock_history
                                         ORDER BY date
                                         DESC LIMIT 1;""", engine, index_col='date')
 
@@ -89,7 +98,7 @@ def actualize_data(data):
         flash("La base de donnée est deja a jour...")
 
     elif last_value_db.empty == True:
-        data.to_sql(name='assets_tables', con=engine, if_exists='append')
+        data.to_sql(name='stock_history', con=engine, if_exists='append')
         flash("La base de donnée à reçu ses première observation")
 
     else :
