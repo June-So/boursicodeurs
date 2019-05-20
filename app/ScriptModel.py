@@ -1,34 +1,23 @@
-from app import app
 from SECRET import *
 
-import mysql.connector
+#import mysql.connector
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-import fxcmpy
 
-import os
-
-import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import r2_score
+
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam, RMSprop
 from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
-from tqdm import tqdm_notebook as tqdm
-from sklearn.metrics import mean_squared_error
-
-from keras.models import load_model
-import pickle
-from keras.models import model_from_json
 
 
 time_steps = 100
 backsize = 32
-epochs = 100
+epochs = 2
 
 
 def get_data_on_db():
@@ -91,7 +80,7 @@ def make_timeseries(mat):
 
 
 
-def build_model(X_train):
+def build_model():
 
     # intilialiser le RNN
     regressor = Sequential()
@@ -100,7 +89,7 @@ def build_model(X_train):
     # units : nombre de neuronnes pour cette couche en particulier -> capturer la tendance du cours d'une action donc nombre neuronnes conséquent
     # return_sequences = accumuler des couches LSTM pour des meilleurs résultats -> True
     # input_shape = longueur du premier vecteur
-    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (X_train.shape[1], 9)))
+    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (time_steps, 9)))
     # Pour diminuer les risques de surentrainements
     # Désactiver des neuronnes de façon aléatoire avec une probabilité
     regressor.add(Dropout(0.2))
@@ -139,7 +128,7 @@ def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
 
     filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
-    regressor_trained = build_model(X_train)
+    regressor_trained = build_model()
     regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = backsize, validation_data = (X_valid, y_valid),
                 callbacks=[checkpoint])
 
@@ -187,7 +176,7 @@ def make_prediction(data, model_name):
     X_inputs, y_inputs = make_inputs(inputs_sc)
 
     # chargement du model
-    loaded_model(model_name)
+    model = loaded_model(model_name)
     #X_inputs, y_inputs =
 
     # faire la prédiction
