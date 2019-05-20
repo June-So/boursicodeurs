@@ -66,7 +66,7 @@ def get_predict():
     inputs_pred_ds, real_input_ds = script_model.make_prediction(data, model_name)
 
     print(zip(inputs_pred_ds, real_input_ds))
-    flash('Le modèleà discuter avec lui-même et a fais c\'est prédictions' )
+    flash('Prédiction effectuées')
     return redirect(url_for('index'))
 
 
