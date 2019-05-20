@@ -6,3 +6,4 @@ DATABASE = {
     'port': '3306',
     'database': 'database_name'
 }
+FLASK_SECRET_KEY = 'secret-key'

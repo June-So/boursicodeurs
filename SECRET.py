@@ -1,4 +1,3 @@
-# Dont push ou share this file in public after you edit with your private access
 FXCMY_ACCESS_TOKEN = 'token-access-api-fxcmy'
 DATABASE = {
     'user': 'user',
@@ -7,3 +6,4 @@ DATABASE = {
     'port': '3306',
     'database': 'database_name'
 }
+FLASK_SECRET_KEY = 'secret-key'
