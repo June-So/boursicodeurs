@@ -5,11 +5,13 @@ chardet==3.0.4
 Click==7.0
 configparser==3.7.4
 Flask==1.0.2
+flask-sqlacodegen==1.1.6.1
 fxcmpy==1.2.4
 gast==0.2.2
 grpcio==1.20.1
 h5py==2.9.0
 idna==2.8
+inflect==2.1.0
 itsdangerous==1.1.0
 Jinja2==2.10.1
 joblib==0.13.2
@@ -19,6 +21,7 @@ Keras-Preprocessing==1.0.9
 Markdown==3.1
 MarkupSafe==1.1.1
 mock==3.0.5
+mysqlclient==1.4.2.post1
 numpy==1.16.3
 pandas==0.24.2
 protobuf==3.7.1

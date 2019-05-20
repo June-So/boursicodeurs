@@ -1,6 +1,5 @@
 from SECRET import *
 
-#import mysql.connector
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
@@ -10,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint
-from keras.optimizers import Adam, RMSprop
+from keras.optimizers import Adam
 from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
 
