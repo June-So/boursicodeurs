@@ -15,4 +15,4 @@ Modèle de prédiction de tendance boursière
  pip install --upgrade -r requirements.txt
 ```
 ### Configuration
-- Modifiez le fichier `SECRET.py`  avec vos informations de connexion (token Fxcm, identifiant base ded onnées).
+- Faire une copie de `SECRET_demo.py` sous le nom de `SECRET.py` . Remplacer les valeurs par vos informations de connexion (token Fxcm, identifiant base de données).
