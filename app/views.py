@@ -105,7 +105,7 @@ def actualize_data(data):
         # On recupère les lignes qui sont supérieurs à la dernière date enrégistré dans la base de données
         ecart_df = data[data.index.values > last_value_db.index.values]
 
-        ecart_df.to_sql(name='assets_tables', con=engine, if_exists='append')
-        flash("{} row(s) ont été rajoutée(s) à la table assets_tables".format(len(ecart_df)))
+        ecart_df.to_sql(name='stock_history', con=engine, if_exists='append')
+        flash("{} row(s) ont été rajoutée(s) à la table stock_history".format(len(ecart_df)))
 
     return data
