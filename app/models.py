@@ -45,3 +45,15 @@ class Asset(db.Model):
     def __init__(self, name):
         self.name = name
 
+
+class TrainHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    epochs = db.Column(db.Integer)
+    batch_size = db.Column(db.Integer)
+    time_steps = db.Column(db.Integer)
+    total_data = db.Column(db.Integer)
+    score_train = db.Column(db.Float(asdecimal=True))
+    score_test = db.Column(db.Float(asdecimal=True))
+    filename = db.Column(db.String(255))
+
+

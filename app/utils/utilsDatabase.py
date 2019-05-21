@@ -2,8 +2,8 @@ from SECRET import *
 from sqlalchemy import create_engine
 from flask import flash
 import pandas as pd
-
-
+from app.models import Asset
+from app import db
 
 def actualize_data(data):
     """
@@ -35,3 +35,14 @@ def actualize_data(data):
         flash("{} row(s) ont été rajoutée(s) à la table stock_history".format(len(ecart_df)))
 
     return data
+
+
+def get_asset(instrument):
+    """ Get asset by name, if not exist: create"""
+    asset = Asset.query.filter(Asset.name == instrument).first()
+    if not asset:
+        asset = Asset(instrument)
+        db.session.add(asset)
+        db.session.commit()
+
+    return asset

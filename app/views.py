@@ -4,19 +4,22 @@ import fxcmpy
 import pandas as pd
 from SECRET import *
 from sqlalchemy import create_engine
-from .models import Asset
 from .utils import utilsDatabase
 import app.ScriptModel as script_model
+from app.forms import TrainForm
 
 
 @app.route('/')
 def index():
+    # formulaire d'entrainement
+    form = TrainForm()
+
     # connection API fxcmpy
     con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
     # list of instruments, generate choice for get data in view
     instruments = con_fxcmpy.get_instruments()
-    return render_template('index.html', instruments=instruments)
+    return render_template('index.html', instruments=instruments, trainform=form)
 
 
 @app.route('/get-data-<instrument>', methods=['GET'])
@@ -26,13 +29,8 @@ def get_data(instrument):
     :param instrument: name of instrument for research
     :return: json of data for instrument
     """
-    #get asset
-    asset = Asset.query.filter(Asset.name == instrument).first()
-    print(asset)
-    if not asset:
-        asset = Asset(instrument)
-        db.session.add(asset)
-        db.session.commit()
+    # get asset or create
+    asset = utilsDatabase.get_asset(instrument)
 
     # connection API fxcmpy
     con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
@@ -56,14 +54,19 @@ def get_data(instrument):
     return data.to_json()
 
 
-@app.route('/train-model')
+@app.route('/train-model', methods=['GET', 'POST'])
 def train_model():
     """ entraîne le modèle sur les donnèes existantes
         effectue une sauvegarde du model
     """
-    model = script_model.train_model()
-    flash('Le modèle à bien été entraîné')
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        epochs = request.form['epochs']
+        time_step = request.form['time_steps']
+        batch_size = request.form['batch_size']
+
+        model = script_model.train_model(epochs=int(epochs), batch_size= int(batch_size), time_steps=int(time_step))
+        flash('Le modèle à bien été entraîné')
+        return redirect(url_for('index'))
 
 
 @app.route('/get-predict')

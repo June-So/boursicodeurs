@@ -14,9 +14,9 @@ from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
 from keras import backend as K
 
-time_steps = 100
-backsize = 32
-epochs = 2
+#time_steps = 100
+#backsize = 32
+#epochs = 2
 
 
 def get_data_on_db():
@@ -62,7 +62,7 @@ def normalize_data(data):
 
 
 
-def make_timeseries(mat):
+def make_timeseries(mat, time_steps):
     """this function transform array in timeseries array"""
     dim_0 = mat.shape[0]
 
@@ -80,7 +80,7 @@ def make_timeseries(mat):
 
 
 
-def build_model():
+def build_model(time_steps):
 
     # intilialiser le RNN
     regressor = Sequential()
@@ -121,19 +121,17 @@ def build_model():
     return regressor
 
 
-
-def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
+def fit_model(X_train, y_train, X_valid, y_valid, modif=0,epochs=5, batch_size=10, time_steps=2):
     """la variable modif permet de pas écrasser après modification,
      le model entrainé précédement"""
     K.clear_session()
     filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
-    regressor_trained = build_model()
-    regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = backsize, validation_data = (X_valid, y_valid),
+    regressor_trained = build_model(time_steps)
+    regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, validation_data = (X_valid, y_valid),
                 callbacks=[checkpoint])
 
     return regressor_trained
-
 
 
 def loaded_model(nom_model):
@@ -141,7 +139,6 @@ def loaded_model(nom_model):
     model = build_model()
     model.load_weights('app/models/' + nom_model)
     return model
-
 
 
 def make_inputs(mat):
@@ -190,8 +187,7 @@ def make_prediction(data, model_name):
     return inputs_pred_ds, real_input_ds
 
 
-
-def train_model():
+def train_model(epochs, batch_size, time_steps):
     K.clear_session()
 
     """this function allowed to train model"""
@@ -207,12 +203,12 @@ def train_model():
 
 
     # faire des données X_train et y_train
-    X_train, y_train = make_timeseries(train_sc)
+    X_train, y_train = make_timeseries(train_sc, time_steps)
 
-    X_valid, y_valid = make_timeseries(valid_sc)
+    X_valid, y_valid = make_timeseries(valid_sc, time_steps)
 
-    X_test, y_test = make_timeseries(test_sc)
+    X_test, y_test = make_timeseries(test_sc, time_steps)
 
 
-    model_trained = fit_model(X_train, y_train, X_valid, y_valid)
+    model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps)
     return model_trained
