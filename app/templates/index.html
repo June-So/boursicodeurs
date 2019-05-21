@@ -10,7 +10,7 @@
     <div>
         <h2>Liste des indices</h2>
         {% for instrument in instruments %}
-            <a href="{{ url_for('get_data', instrument=instrument, period='H1', number=2600)}}">{{ instrument }}</a>
+            <a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a>
         {% endfor %}
     </div>
 {% endblock %}
