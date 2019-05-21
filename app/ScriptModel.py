@@ -12,7 +12,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
-
+from keras import backend as K
 
 time_steps = 100
 backsize = 32
@@ -26,7 +26,8 @@ def get_data_on_db():
     engine = create_engine('mysql+mysqldb://{user}:{password}@{server}:{port}/{database}?charset=utf8mb4'.format(**DATABASE))
 
     # Récuperer les données de la base de donnée dans un dataframe
-    data = pd.read_sql_query("""SELECT * FROM assets_tables;""", engine, index_col='date')
+    data = pd.read_sql_query("""SELECT * FROM stock_history;""", engine, index_col='date')
+    data = data.drop(['asset_id', 'id'], axis=1)
     return data
 
 
@@ -124,7 +125,7 @@ def build_model():
 def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
     """la variable modif permet de pas écrasser après modification,
      le model entrainé précédement"""
-
+    K.clear_session()
     filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
     regressor_trained = build_model()
@@ -136,6 +137,7 @@ def fit_model(X_train, y_train, X_valid, y_valid, modif=0):
 
 
 def loaded_model(nom_model):
+    K.clear_session()
     model = build_model()
     model.load_weights('app/models/' + nom_model)
     return model
@@ -161,6 +163,8 @@ def make_inputs(mat):
 
 
 def make_prediction(data, model_name):
+    K.clear_session()
+
     previousDays = len(data) - time_steps
 
 
@@ -180,7 +184,6 @@ def make_prediction(data, model_name):
 
     # faire la prédiction
     inputs_pred = model.predict(X_inputs)
-
     # il faut déscaliser la prédiction et le target
     inputs_pred_ds = sc.inverse_transform(inputs_pred)
     real_input_ds = sc.inverse_transform(y_inputs)
@@ -189,6 +192,8 @@ def make_prediction(data, model_name):
 
 
 def train_model():
+    K.clear_session()
+
     """this function allowed to train model"""
     data = get_data_on_db()
 
