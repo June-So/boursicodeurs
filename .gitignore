@@ -1,0 +1,8 @@
+# Secret config
+SECRET.py
+
+# Environnements local
+venv/
+migrations/
+*__pycache__*
+.idea/
