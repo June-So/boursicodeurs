@@ -5,7 +5,7 @@ import pandas as pd
 from SECRET import *
 from sqlalchemy import create_engine
 from .utils import utilsDatabase
-import app.ScriptModel as script_model
+import app.utils.ScriptModel as script_model
 from app.forms import TrainForm
 from app.models import TrainHistory
 

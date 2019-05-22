@@ -37,6 +37,9 @@ def actualize_data(data):
     return data
 
 
+
+
+
 def get_asset(instrument):
     """ Get asset by name, if not exist: create"""
     asset = Asset.query.filter(Asset.name == instrument).first()
@@ -46,4 +49,3 @@ def get_asset(instrument):
         db.session.commit()
 
     return asset
-
