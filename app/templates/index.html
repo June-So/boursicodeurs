@@ -15,9 +15,31 @@
             {{ trainform.time_steps }}
             {{ trainform.submit }}
         </form>
-        <a href="{{ url_for('train_model') }}"><button>train</button></a>
-
-        <a href="{{ url_for('get_predict') }}"><button>get predict</button></a>
+    </div>
+    <div class="">
+        <h2>Prédiction</h2>
+        <table>
+             <tr>
+                <td>filename</td>
+                <td>epochs</td>
+                <td>batch_size</td>
+                <td>time_steps</td>
+                <td>total_train</td>
+                <td>total_test</td>
+                <td></td>
+            </tr>
+        {% for model in list_models %}
+            <tr>
+                <td>{{ model.filename }}</td>
+                <td>{{ model.epochs }}</td>
+                <td>{{ model.batch_size }}</td>
+                <td>{{ model.time_steps }}</td>
+                <td>{{ model.total_train }}</td>
+                <td>{{ model.total_test }}</td>
+                <td><a href="{{ url_for('get_predict', id=model.id) }}"><button>Utiliser</button></a></td>
+            </tr>
+        {% endfor %}
+        </table>
     </div>
 
     <div>

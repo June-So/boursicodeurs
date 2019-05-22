@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from .utils import utilsDatabase
 import app.ScriptModel as script_model
 from app.forms import TrainForm
+from app.models import TrainHistory
 
 
 @app.route('/')
@@ -19,7 +20,8 @@ def index():
 
     # list of instruments, generate choice for get data in view
     instruments = con_fxcmpy.get_instruments()
-    return render_template('index.html', instruments=instruments, trainform=form)
+    list_models = TrainHistory.query.all()
+    return render_template('index.html', instruments=instruments, trainform=form, list_models=list_models)
 
 
 @app.route('/get-data-<instrument>', methods=['GET'])
@@ -64,19 +66,25 @@ def train_model():
         time_step = request.form['time_steps']
         batch_size = request.form['batch_size']
 
-        model = script_model.train_model(epochs=int(epochs), batch_size= int(batch_size), time_steps=int(time_step))
+        # Entrainement du model
+        script_model.train_model(epochs=int(epochs), batch_size=int(batch_size), time_steps=int(time_step))
+
+        # Sauvegarde du model
+
+
         flash('Le modèle à bien été entraîné')
         return redirect(url_for('index'))
+    return 'Vous ne devriez pas être là.. Passez par le formulaire !'
 
 
-@app.route('/get-predict')
-def get_predict():
+@app.route('/get-predict-<id>')
+def get_predict(id):
     """ Prédiction du modèle """
-    model_name = 'modelDAX_Hour0.hdf5'
+    train_history = TrainHistory.query.get(id)
     # récupère toutes les données
     data = script_model.get_data_on_db()
 
-    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, model_name)
+    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, train_history)
 
     print(zip(inputs_pred_ds, real_input_ds))
     flash('Prédiction effectuées')

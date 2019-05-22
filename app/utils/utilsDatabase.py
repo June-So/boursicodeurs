@@ -2,7 +2,7 @@ from SECRET import *
 from sqlalchemy import create_engine
 from flask import flash
 import pandas as pd
-from app.models import Asset
+from app.models import Asset, TrainHistory
 from app import db
 
 def actualize_data(data):
@@ -46,3 +46,4 @@ def get_asset(instrument):
         db.session.commit()
 
     return asset
+

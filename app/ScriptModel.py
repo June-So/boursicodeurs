@@ -3,9 +3,9 @@ from SECRET import *
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
-
+from app import db
 from sklearn.preprocessing import MinMaxScaler
-
+from app.models import TrainHistory
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint
@@ -121,11 +121,11 @@ def build_model(time_steps):
     return regressor
 
 
-def fit_model(X_train, y_train, X_valid, y_valid, modif=0,epochs=5, batch_size=10, time_steps=2):
+def fit_model(X_train, y_train, X_valid, y_valid, epochs=5, batch_size=10, time_steps=2, train_history=None):
     """la variable modif permet de pas écrasser après modification,
      le model entrainé précédement"""
     K.clear_session()
-    filename = 'modelDAX_Hour' + str(modif) + '.hdf5'
+    filename = train_history.filename
     checkpoint = ModelCheckpoint('app/models/' + filename, monitor='val_loss',mode='min', verbose=1, save_best_only=True)
     regressor_trained = build_model(time_steps)
     regressor_trained.fit(X_train, y_train, epochs = epochs, batch_size = batch_size, validation_data = (X_valid, y_valid),
@@ -134,14 +134,14 @@ def fit_model(X_train, y_train, X_valid, y_valid, modif=0,epochs=5, batch_size=1
     return regressor_trained
 
 
-def loaded_model(nom_model):
+def loaded_model(filename, time_steps):
     K.clear_session()
-    model = build_model()
-    model.load_weights('app/models/' + nom_model)
+    model = build_model(time_steps)
+    model.load_weights('app/models/' + filename)
     return model
 
 
-def make_inputs(mat):
+def make_inputs(mat, time_steps):
     """format input before predict"""
     dim_0 = mat.shape[0]
     #time_steps = 400 # le nbre de time_steps
@@ -159,10 +159,10 @@ def make_inputs(mat):
     return X, y
 
 
-def make_prediction(data, model_name):
+def make_prediction(data, train_history):
     K.clear_session()
 
-    previousDays = len(data) - time_steps
+    previousDays = len(data) - train_history.time_steps
 
 
     # l'entrée est contitué des derniers jour récupérés
@@ -173,10 +173,10 @@ def make_prediction(data, model_name):
     inputs_sc, sc = normalize_data(inputs)
 
     #X_inputs, y_inputs = make_timeseries(inputs_sc)
-    X_inputs, y_inputs = make_inputs(inputs_sc)
+    X_inputs, y_inputs = make_inputs(inputs_sc, train_history.time_steps)
 
     # chargement du model
-    model = loaded_model(model_name)
+    model = loaded_model(train_history.filename, train_history.time_steps)
     #X_inputs, y_inputs =
 
     # faire la prédiction
@@ -188,9 +188,8 @@ def make_prediction(data, model_name):
 
 
 def train_model(epochs, batch_size, time_steps):
-    K.clear_session()
-
     """this function allowed to train model"""
+    K.clear_session()
     data = get_data_on_db()
 
     dataset_train, dataset_valid, dataset_test = split_data(data)
@@ -209,6 +208,16 @@ def train_model(epochs, batch_size, time_steps):
 
     X_test, y_test = make_timeseries(test_sc, time_steps)
 
+    ## Save history
+    train_history = TrainHistory(epochs=epochs, time_steps=time_steps, batch_size=batch_size)
+    train_history.total_train = X_train.shape[0]
+    train_history.total_test = X_test.shape[0]
+    db.session.add(train_history)
+    db.session.commit()
 
-    model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps)
+    train_history.filename = 'modelDAX_Hour' + str(train_history.id) + '.hdf5'
+    db.session.commit()
+
+
+    model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps, train_history=train_history)
     return model_trained
