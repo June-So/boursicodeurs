@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 from .utils import utilsDatabase
 import app.utils.ScriptModel as script_model
 from app.forms import TrainForm
-from app.models import TrainHistory
+from app.models import TrainHistory, Asset
 
 
 @app.route('/')
@@ -77,15 +77,16 @@ def train_model():
     return 'Vous ne devriez pas être là.. Passez par le formulaire !'
 
 
-@app.route('/get-predict-<id>')
-def get_predict(id):
+@app.route('/get-predict-<asset>-<model>')
+def get_predict(asset, model):
     """ Prédiction du modèle """
-    train_history = TrainHistory.query.get(id)
+    train_history = TrainHistory.query.get(model)
+    asset = Asset.query.get(asset)
     # récupère toutes les données
     data = script_model.get_data_on_db()
 
-    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, train_history)
+    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, train_history, asset)
 
-    print(zip(inputs_pred_ds, real_input_ds))
+    print(inputs_pred_ds)
     flash('Prédiction effectuées')
     return redirect(url_for('index'))

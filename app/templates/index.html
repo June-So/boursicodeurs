@@ -36,7 +36,7 @@
                 <td>{{ model.time_steps }}</td>
                 <td>{{ model.total_train }}</td>
                 <td>{{ model.total_test }}</td>
-                <td><a href="{{ url_for('get_predict', id=model.id) }}"><button>Utiliser</button></a></td>
+                <td><a href="{{ url_for('get_predict', model=model.id, asset=1) }}"><button>Utiliser</button></a></td>
             </tr>
         {% endfor %}
         </table>

@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy import create_engine
 from app import db
 from sklearn.preprocessing import MinMaxScaler
-from app.models import TrainHistory
+from app.models import TrainHistory, StockPrediction
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint
@@ -13,6 +13,7 @@ from keras.optimizers import Adam
 from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
 from keras import backend as K
+import datetime
 
 #time_steps = 100
 #backsize = 32
@@ -31,7 +32,6 @@ def get_data_on_db():
     return data
 
 
-
 # splitage du dataset en trois parties
 def split_data(data):
     """Split data in three dataframe
@@ -44,7 +44,6 @@ def split_data(data):
     return df_train, df_valid, df_test
 
 
-
 def normalize_data(data):
     """
     take an input data and return data scaled
@@ -52,7 +51,7 @@ def normalize_data(data):
     """
     if data.shape[1] > 1:
         data = data.values
-    else :
+    else:
         data = data.values.reshape(-1,1)
 
     sc = MinMaxScaler(feature_range = (0, 1))
@@ -159,7 +158,7 @@ def make_inputs(mat, time_steps):
     return X, y
 
 
-def make_prediction(data, train_history):
+def make_prediction(data, train_history, asset):
     K.clear_session()
 
     previousDays = len(data) - train_history.time_steps
@@ -175,6 +174,7 @@ def make_prediction(data, train_history):
     #X_inputs, y_inputs = make_timeseries(inputs_sc)
     X_inputs, y_inputs = make_inputs(inputs_sc, train_history.time_steps)
 
+
     # chargement du model
     model = loaded_model(train_history.filename, train_history.time_steps)
     #X_inputs, y_inputs =
@@ -184,6 +184,22 @@ def make_prediction(data, train_history):
     # il faut déscaliser la prédiction et le target
     inputs_pred_ds = sc.inverse_transform(inputs_pred)
     real_input_ds = sc.inverse_transform(y_inputs)
+
+    # sauvegarde dans la base de données
+    prediction = pd.DataFrame(inputs_pred_ds)
+    prediction.columns = inputs.columns
+
+    stock = StockPrediction()
+    stock.add_cotations(**prediction.to_dict())
+    print(type(inputs.index.values.max()))
+    new_date = inputs.index.values.max() + pd.to_timedelta(1,'hours')
+    stock.date = new_date
+    stock.train_history = train_history
+    stock.asset = asset
+
+    db.session.add(stock)
+    db.session.commit()
+
     return inputs_pred_ds, real_input_ds
 
 
@@ -208,10 +224,12 @@ def train_model(epochs, batch_size, time_steps):
 
     X_test, y_test = make_timeseries(test_sc, time_steps)
 
+    ## Result scoring
+
     ## Save history
     train_history = TrainHistory(epochs=epochs, time_steps=time_steps, batch_size=batch_size)
     train_history.total_train = X_train.shape[0]
-    train_history.total_test = X_test.shape[0]
+    train_history.total_test = X_valid.shape[0]
     db.session.add(train_history)
     db.session.commit()
 
@@ -220,4 +238,6 @@ def train_model(epochs, batch_size, time_steps):
 
 
     model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps, train_history=train_history)
+
+
     return model_trained
