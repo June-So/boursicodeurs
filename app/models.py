@@ -51,9 +51,11 @@ class TrainHistory(db.Model):
     epochs = db.Column(db.Integer)
     batch_size = db.Column(db.Integer)
     time_steps = db.Column(db.Integer)
-    total_test = db.Column(db.Integer)
     total_train = db.Column(db.Integer)
+    total_validation = db.Column(db.Integer) 
+    total_test = db.Column(db.Integer)
     score_train = db.Column(db.Float(asdecimal=True))
+    score_validation = db.Column(db.Float(asdecimal=True))
     score_test = db.Column(db.Float(asdecimal=True))
     filename = db.Column(db.String(255))
 
@@ -61,5 +63,3 @@ class TrainHistory(db.Model):
         self.epochs = epochs
         self.batch_size = batch_size
         self.time_steps = time_steps
-
-

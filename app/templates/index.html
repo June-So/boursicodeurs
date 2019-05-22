@@ -25,8 +25,11 @@
                 <td>batch_size</td>
                 <td>time_steps</td>
                 <td>total_train</td>
+                <td>total_validation</td>
                 <td>total_test</td>
-                <td></td>
+                <td>score_train</td>
+                <td>score_validation</td>
+                <td>score_test</td>
             </tr>
         {% for model in list_models %}
             <tr>
@@ -35,7 +38,11 @@
                 <td>{{ model.batch_size }}</td>
                 <td>{{ model.time_steps }}</td>
                 <td>{{ model.total_train }}</td>
+                <td>{{ model.total_validation }}</td>
                 <td>{{ model.total_test }}</td>
+                <td>{{ model.score_train }}</td>
+                <td>{{ model.score_validation }}</td>
+                <td>{{ model.score_test }}</td>
                 <td><a href="{{ url_for('get_predict', id=model.id) }}"><button>Utiliser</button></a></td>
             </tr>
         {% endfor %}

@@ -13,6 +13,7 @@ from keras.optimizers import Adam
 from keras.layers import LSTM
 from sklearn.model_selection import train_test_split
 from keras import backend as K
+from sklearn.metrics import mean_squared_error
 
 #time_steps = 100
 #backsize = 32
@@ -211,6 +212,7 @@ def train_model(epochs, batch_size, time_steps):
     ## Save history
     train_history = TrainHistory(epochs=epochs, time_steps=time_steps, batch_size=batch_size)
     train_history.total_train = X_train.shape[0]
+    train_history.total_validation = X_valid.shape[0]
     train_history.total_test = X_test.shape[0]
     db.session.add(train_history)
     db.session.commit()
@@ -220,4 +222,28 @@ def train_model(epochs, batch_size, time_steps):
 
 
     model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps, train_history=train_history)
+
+    # Prediction sur les données du train suivi de sa descalisation
+    y_pred_train = model_trained.predict(X_train)
+    y_pred_train_ds = sc.inverse_transform(y_pred_train)
+
+    # Prediction sur les données de la validation suivi de sa descalisation
+    y_pred_valid = model_trained.predict(X_valid)
+    y_pred_valid_ds = sc.inverse_transform(y_pred_valid)
+
+    # Prediction sur les données du test suivi de sa descalisation
+    y_pred_test = model_trained.predict(X_test)
+    y_pred_valid_ds = sc.inverse_transform(y_pred_test)
+
+    # metrics du models
+    rmse_train = round(np.sqrt(mean_squared_error(y_pred_train, y_train)),3)
+    rmse_valid = round(np.sqrt(mean_squared_error(y_pred_valid, y_valid)),3)
+    rmse_test = round(np.sqrt(mean_squared_error(y_pred_test, y_test)),3)
+
+    # insertion des metrics dans la base de donnée
+    train_history.score_train = rmse_train
+    train_history.score_validation = rmse_valid
+    train_history.score_test = rmse_test
+    db.session.commit()
+
     return model_trained
