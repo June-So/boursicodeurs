@@ -40,14 +40,10 @@
                 <td>{{ model.total_train }}</td>
                 <td>{{ model.total_validation }}</td>
                 <td>{{ model.total_test }}</td>
-<<<<<<< HEAD
-                <td><a href="{{ url_for('get_predict', model=model.id, asset=1) }}"><button>Utiliser</button></a></td>
-=======
                 <td>{{ model.score_train }}</td>
                 <td>{{ model.score_validation }}</td>
                 <td>{{ model.score_test }}</td>
                 <td><a href="{{ url_for('get_predict', id=model.id) }}"><button>Utiliser</button></a></td>
->>>>>>> 5941224e5a9edc6e6325504fbabd6058e0834a33
             </tr>
         {% endfor %}
         </table>
