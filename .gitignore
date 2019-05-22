@@ -6,3 +6,7 @@ venv/
 migrations/
 *__pycache__*
 .idea/
+
+# Application app
+app/create_feed_database.py
+app/shema_assets.sql
