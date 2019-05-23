@@ -43,7 +43,8 @@
                 <td>{{ model.score_train }}</td>
                 <td>{{ model.score_validation }}</td>
                 <td>{{ model.score_test }}</td>
-                <td><a href="{{ url_for('get_predict', id=model.id) }}"><button>Utiliser</button></a></td>
+                <td><a href="{{ url_for('get_predict', model=model.id, asset=1) }}"><button>Utiliser</button></a></td>
+                <td><a href="{{ url_for('delete', model=model.id) }}"><button>Supprimer</button></a></td>
             </tr>
         {% endfor %}
         </table>

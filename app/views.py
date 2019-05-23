@@ -90,3 +90,8 @@ def get_predict(asset, model):
     print(inputs_pred_ds)
     flash('Prédiction effectuées')
     return redirect(url_for('index'))
+
+
+@app.route('/delete-model-<model>')
+def delete(model):
+    return "Nous l'exterminerons !"
