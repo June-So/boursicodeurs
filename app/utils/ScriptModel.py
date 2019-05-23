@@ -185,6 +185,22 @@ def make_prediction(data, train_history, asset):
     # il faut déscaliser la prédiction et le target
     inputs_pred_ds = sc.inverse_transform(inputs_pred)
     real_input_ds = sc.inverse_transform(y_inputs)
+
+    # sauvegarde dans la base de données
+    prediction = pd.DataFrame(inputs_pred_ds)
+    prediction.columns = inputs.columns
+
+    stock = StockPrediction()
+    stock.add_cotations(**prediction.to_dict())
+    print(type(inputs.index.values.max()))
+    new_date = inputs.index.values.max() + pd.to_timedelta(1,'hours')
+    stock.date = new_date
+    stock.train_history = train_history
+    stock.asset = asset
+
+    db.session.add(stock)
+    db.session.commit()
+
     return inputs_pred_ds, real_input_ds
 
 
