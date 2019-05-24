@@ -85,10 +85,8 @@ def get_predict(asset, model):
     # récupère toutes les données
     data = script_model.get_data_on_db()
 
-    inputs_pred_ds, real_input_ds = script_model.make_prediction(data, train_history, asset)
-
-    print(inputs_pred_ds)
-    flash('Prédiction effectuées')
+    stock = script_model.make_prediction(data, train_history, asset)
+    flash(f'Prédiction effectuées pour {stock.asset.name} le {stock.date} :\n ASK :\n\topen :{stock.askopen} close{stock.askclose} low:{stock.asklow} high:{stock.askhigh} \n BID :\n\topen :{stock.bidopen} close{stock.bidclose} low:{stock.bidlow} high:{stock.bidhigh}')
     return redirect(url_for('index'))
 
 

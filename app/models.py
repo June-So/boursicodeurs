@@ -33,8 +33,6 @@ class StockPrediction(db.Model):
 
 
 
-
-
 class StockHystory(db.Model):
     __tablename__ = 'stock_history'
 
