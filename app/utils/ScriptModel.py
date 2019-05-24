@@ -175,7 +175,7 @@ def make_prediction(data, train_history, asset):
     db.session.add(stock)
     db.session.commit()
 
-    return inputs_pred_ds, real_input_ds
+    return stock
 
 
 def train_model(epochs, batch_size, time_steps):
