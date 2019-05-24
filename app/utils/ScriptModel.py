@@ -11,14 +11,17 @@ from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 from keras.layers import LSTM
+from keras.layers import RepeatVector
+from keras.layers import TimeDistributed
 from sklearn.model_selection import train_test_split
 from keras import backend as K
 from sklearn.metrics import mean_squared_error
+from app.models import TrainHistory, Asset
 
 #time_steps = 100
 #backsize = 32
 #epochs = 2
-
+N_FEATURE = 9
 
 def get_data_on_db():
     """
@@ -75,51 +78,22 @@ def make_timeseries(mat, time_steps):
         y.append(mat[i,])
 
     X, y = np.array(X), np.array(y)
-    #X_train = np.reshape(X, (X.shape[0], X.shape[1], 1))
+    y = np.reshape(y, (y.shape[0], 1, y.shape[1]))
 
     return X, y
 
 
 
 def build_model(time_steps):
-
-    # intilialiser le RNN
-    regressor = Sequential()
-
-    # On ajoute le 1er layer
-    # units : nombre de neuronnes pour cette couche en particulier -> capturer la tendance du cours d'une action donc nombre neuronnes conséquent
-    # return_sequences = accumuler des couches LSTM pour des meilleurs résultats -> True
-    # input_shape = longueur du premier vecteur
-    regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (time_steps, 9)))
-    # Pour diminuer les risques de surentrainements
-    # Désactiver des neuronnes de façon aléatoire avec une probabilité
-    regressor.add(Dropout(0.2))
-
-    # On ajoute le 2eme layer
-    regressor.add(LSTM(units = 50, return_sequences = True))
-    regressor.add(Dropout(0.2))
-
-    # On ajoute le 3eme layer
-    regressor.add(LSTM(units = 50, return_sequences = True))
-    regressor.add(Dropout(0.2))
-
-    # On ajoute le 4eme layer
-    regressor.add(LSTM(units = 50))
-    regressor.add(Dropout(0.2))
-
-    # couche de sortie
-    # On veut prédire une seule sortie
-    regressor.add(Dense(units = 9))
-
-    # compiler le rnn
-    # optimizer : algo pour trouver les poids optimaux
-    # Gradient stochastique :
-    # adam fonctionne mieux ici (se base sur mean et volatilité des itérations de la fonction de cout) -> choix sure
-    # fonction de cout : On est dans le cas d'une régression donc MSE
+    model = Sequential()
+    model.add(LSTM(100, activation='relu', input_shape=(time_steps,N_FEATURE)))
+    model.add(RepeatVector(1))
+    model.add(LSTM(100, activation='relu', return_sequences=True))
+    model.add(TimeDistributed(Dense(N_FEATURE)))
     optimizer = Adam(lr=0.001)
-    regressor.compile(optimizer = optimizer, loss = 'mean_squared_error')
+    model.compile(optimizer = optimizer, loss = 'mean_squared_error')
+    return model
 
-    return regressor
 
 
 def fit_model(X_train, y_train, X_valid, y_valid, epochs=5, batch_size=10, time_steps=2, train_history=None):
@@ -241,20 +215,23 @@ def train_model(epochs, batch_size, time_steps):
 
     # Prediction sur les données du train suivi de sa descalisation
     y_pred_train = model_trained.predict(X_train)
+    y_pred_train = y_pred_train.reshape(-1,N_FEATURE)
     y_pred_train_ds = sc.inverse_transform(y_pred_train)
 
     # Prediction sur les données de la validation suivi de sa descalisation
     y_pred_valid = model_trained.predict(X_valid)
+    y_pred_valid = y_pred_valid.reshape(-1,N_FEATURE)
     y_pred_valid_ds = sc.inverse_transform(y_pred_valid)
 
     # Prediction sur les données du test suivi de sa descalisation
     y_pred_test = model_trained.predict(X_test)
-    y_pred_valid_ds = sc.inverse_transform(y_pred_test)
+    y_pred_test = y_pred_test.reshape(-1,N_FEATURE)
+    y_pred_test_ds = sc.inverse_transform(y_pred_test)
 
     # metrics du models
-    rmse_train = round(np.sqrt(mean_squared_error(y_pred_train, y_train)),3)
-    rmse_valid = round(np.sqrt(mean_squared_error(y_pred_valid, y_valid)),3)
-    rmse_test = round(np.sqrt(mean_squared_error(y_pred_test, y_test)),3)
+    rmse_train = round(np.sqrt(mean_squared_error(y_pred_train, y_train.reshape(-1,N_FEATURE))),3)
+    rmse_valid = round(np.sqrt(mean_squared_error(y_pred_valid, y_valid.reshape(-1,N_FEATURE))),3)
+    rmse_test = round(np.sqrt(mean_squared_error(y_pred_test, y_test.reshape(-1,N_FEATURE))),3)
 
     # insertion des metrics dans la base de donnée
     train_history.score_train = rmse_train
