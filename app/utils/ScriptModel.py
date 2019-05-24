@@ -157,8 +157,8 @@ def make_prediction(data, train_history, asset):
     # faire la prédiction
     inputs_pred = model.predict(X_inputs)
     # il faut déscaliser la prédiction et le target
-    inputs_pred_ds = sc.inverse_transform(inputs_pred)
-    real_input_ds = sc.inverse_transform(y_inputs)
+    inputs_pred_ds = sc.inverse_transform(inputs_pred.reshape(-1,N_FEATURE))
+    real_input_ds = sc.inverse_transform(y_inputs.reshape(-1,N_FEATURE))
 
     # sauvegarde dans la base de données
     prediction = pd.DataFrame(inputs_pred_ds)

@@ -98,3 +98,25 @@ def delete(model_id):
     os.remove('app/models/' + train_history.filename)
     flash(f"Nous avons exterminé le modèle n°{train_history.id} !")
     return redirect(url_for('index'))
+
+
+
+
+@app.route('/bot')
+def bot():
+    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
+
+    data = con_fxcmpy.get_candles('GER30', period='H1', number=1000)
+
+    #con.get_open_positions().T
+
+    model_id = 1
+    asset_id = 1
+
+    train_history = TrainHistory.query.get(model_id)
+    asset = Asset.query.get(asset_id)
+
+    cot = make_prediction(data, train_history, asset)
+    print(cot)
+
+    return render_template('bot.html', instruments=instruments, trainform=form, list_models=list_models)
