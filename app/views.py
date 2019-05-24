@@ -8,7 +8,7 @@ from .utils import utilsDatabase
 import app.utils.ScriptModel as script_model
 from app.forms import TrainForm
 from app.models import TrainHistory, Asset
-
+import os
 
 @app.route('/')
 def index():
@@ -77,11 +77,11 @@ def train_model():
     return 'Vous ne devriez pas être là.. Passez par le formulaire !'
 
 
-@app.route('/get-predict-<asset>-<model>')
-def get_predict(asset, model):
+@app.route('/get-predict-<int:asset_id>-<int:model_id>')
+def get_predict(asset_id, model_id):
     """ Prédiction du modèle """
-    train_history = TrainHistory.query.get(model)
-    asset = Asset.query.get(asset)
+    train_history = TrainHistory.query.get(model_id)
+    asset = Asset.query.get(asset_id)
     # récupère toutes les données
     data = script_model.get_data_on_db()
 
@@ -90,6 +90,11 @@ def get_predict(asset, model):
     return redirect(url_for('index'))
 
 
-@app.route('/delete-model-<model>')
-def delete(model):
-    return "Nous l'exterminerons !"
+@app.route('/delete-model-<int:model_id>')
+def delete(model_id):
+    train_history = TrainHistory.query.get(model_id)
+    db.session.delete(train_history)
+    db.session.commit()
+    os.remove('app/models/' + train_history.filename)
+    flash(f"Nous avons exterminé le modèle n°{train_history.id} !")
+    return redirect(url_for('index'))

@@ -72,7 +72,7 @@ class TrainHistory(db.Model):
     score_validation = db.Column(db.Float(asdecimal=True))
     score_test = db.Column(db.Float(asdecimal=True))
     filename = db.Column(db.String(255))
-    stock_predictions = db.relationship('StockPrediction', backref='train_history', lazy=True)
+    stock_predictions = db.relationship('StockPrediction', backref='train_history', cascade="all,delete", lazy=True)
 
     def __init__(self, epochs=epochs, batch_size=batch_size, time_steps=time_steps):
         self.epochs = epochs
