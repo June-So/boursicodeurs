@@ -110,13 +110,25 @@ def bot():
 
     #con.get_open_positions().T
 
-    model_id = 1
+    model_id = 10
     asset_id = 1
 
     train_history = TrainHistory.query.get(model_id)
     asset = Asset.query.get(asset_id)
 
-    cot = make_prediction(data, train_history, asset)
-    print(cot)
+    cot = script_model.make_prediction(data, train_history, asset)
 
-    return render_template('bot.html', instruments=instruments, trainform=form, list_models=list_models)
+    askopen = cot.askopen
+    askclose = cot.askclose
+    bidopen = cot.bidopen
+    bidclose = cot.bidclose
+
+    # Pour passer un ordre d'achat
+    if askclose > askopen:
+        con_fxcmpy.create_market_buy_order('GER30', 5)
+    if askclose < askopen:
+        con_fxcmpy.create_market_sell_order('GER30', 5)
+
+    print(cot.bidclose)
+
+    return render_template('bot.html', cot=cot)
