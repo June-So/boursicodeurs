@@ -1,23 +1,37 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf8"/>
-        <title>Boursicodeurs</title>
-    </head>
-    <body>
-        <!-- Messages flash -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul class=flashes>
-            {% for category, message in messages %}
-              <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+<head>
+    <meta charset="utf8"/>
+    <title>Boursicodeurs</title>
+    <link rel="stylesheet" href="static/css/bootstrap-4.2.1-dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="static/css/bootstrap-4.2.1-dist/styles.css"/>
+</head>
 
-        <!-- main content -->
-        {% block body %}
-        {% endblock %}
-    </body>
+<body>
+    <!-- Messages flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+  <header>
+    <h1>Boursicodeurs</h1>
+  </header>
+
+  <div class="container-fluid">
+    <!-- main content -->
+    {% block body %}
+    {% endblock %}
+  </div>
+
+  <footer>
+    <p>L'appli des Boursicodeurs fait par des Boursicodeurs pour les Boursicodeurs</p>
+  </footer>
+
+</body>
 </html>

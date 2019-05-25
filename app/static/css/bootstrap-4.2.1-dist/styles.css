@@ -1,0 +1,90 @@
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+}
+
+a {
+	color: #222;
+	border-bottom: 1px dashed #000;
+	text-decoration: none;
+}
+
+
+
+header {
+    background-color: #3e5860;
+
+    height: 80px;
+    padding-top: 10px;
+    padding-bottom: 13px;
+}
+
+header aside {
+	float: right;
+	margin-right: 20px;
+}
+
+header h1 {
+	margin: 0 30px;
+	font-size: 3.5em;
+	font-family: 'Open Sans';
+}
+
+footer {
+    background-color: #3e5860;
+    color: #333;
+    height: 90px;
+    padding: 20px;
+}
+
+
+form label {
+	display: block;
+	float: left;
+	font-weight: lighter;
+	width: 200px;
+	text-align: justify;
+	font-family: Arvo, Arial;
+
+}
+
+form input, form select {
+	border: 1px solid #d9d9d9;
+	color: #343434;
+	float: left;
+	margin: 4px;
+	padding: 4px;
+}
+
+form textarea {
+	height: 150px;
+}
+
+form p {
+	clear: both;
+}
+
+.clear {
+	clear:both;
+}
+
+input[type="submit"] {
+    background-color: #0078E7;
+    color: #FFF;
+    font-family: Verdana;
+    font-size: 0.9em;
+    padding: 0.5em 1em;
+    border: 0px none transparent;
+    text-decoration: none;
+    border-radius: 2px;
+    display: inline-block;
+}
+
+.btn {
+	margin: 4px;
+	padding: 5px;
+}

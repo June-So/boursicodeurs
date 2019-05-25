@@ -1,39 +1,48 @@
 {% extends 'base.html' %}
 {% block body %}
-    <h1>Boursicodeurs</h1>
     <p>Site en construction</p>
 
-    <div>
-        <h2>Gestion du model</h2>
-        <form method="POST" action="{{ url_for('train_model') }}">
-            {{ trainform.hidden_tag() }}
+    <div class="container-fluid">
+      <h2>Gestion du model</h2>
+      <form method="POST" action="{{ url_for('train_model') }}">
+        <div class="row">
+          {{ trainform.hidden_tag() }}
+          <div class="col">
             {{ trainform.epochs.label() }}
             {{ trainform.epochs }}
+          </div>
+          <div class="col">
             {{ trainform.batch_size.label() }}
             {{ trainform.batch_size }}
+          </div>
+          <div class="col">
             {{ trainform.time_steps.label() }}
             {{ trainform.time_steps }}
+          </div>
+        </div>
+          <div class="row">
             {{ trainform.submit }}
-        </form>
+          </div>
+      </form>
     </div>
     <div class="">
         <h2>Prédiction</h2>
-        <table>
+        <table class="table">
              <tr>
-                <td>filename</td>
-                <td>epochs</td>
-                <td>batch_size</td>
-                <td>time_steps</td>
-                <td>total_train</td>
-                <td>total_validation</td>
-                <td>total_test</td>
-                <td>score_train</td>
-                <td>score_validation</td>
-                <td>score_test</td>
+                <th scope="col">filename</th>
+                <th scope="col">epochs</th>
+                <th scope="col">batch_size</th>
+                <th scope="col">time_steps</th>
+                <th scope="col">total_train</th>
+                <th scope="col">total_validation</th>
+                <th scope="col">total_test</th>
+                <th scope="col">score_train</th>
+                <th scope="col">score_validation</th>
+                <th scope="col">score_test</th>
             </tr>
         {% for model in list_models %}
             <tr>
-                <td>{{ model.filename }}</td>
+                <th scope="row">{{ model.filename }}</th>
                 <td>{{ model.epochs }}</td>
                 <td>{{ model.batch_size }}</td>
                 <td>{{ model.time_steps }}</td>
@@ -53,7 +62,7 @@
     <div>
         <h2>Liste des indices</h2>
         {% for instrument in instruments %}
-            <a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a>
+            <button type="button" class="btn btn-info"><a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a></button>
         {% endfor %}
     </div>
 {% endblock %}

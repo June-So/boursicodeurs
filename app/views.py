@@ -16,7 +16,7 @@ def index():
     form = TrainForm()
 
     # connection API fxcmpy
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
+    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN_REAL, server='real')
 
     # list of instruments, generate choice for get data in view
     instruments = con_fxcmpy.get_instruments()
@@ -123,11 +123,26 @@ def bot():
     bidopen = cot.bidopen
     bidclose = cot.bidclose
 
-    # Pour passer un ordre d'achat
+    askhigh = cot.askhigh
+    asklow = cot.asklow
+    bidhigh = cot.bidhigh
+    bidlow = cot.bidlow
+
+
+    # Pour passer un ordre d'achat ou vente
     if askclose > askopen:
-        con_fxcmpy.create_market_buy_order('GER30', 5)
+        #con_fxcmpy.create_market_buy_order('GER30', 5)
+        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
+                       rate=105, is_in_pips=False,
+                       amount='1000', time_in_force='GTC',
+                       order_type='AtMarket', limit=120)
+
     if askclose < askopen:
         con_fxcmpy.create_market_sell_order('GER30', 5)
+        order = con.open_trade(symbol='GER30', is_buy=True,
+                       rate=105, is_in_pips=False,
+                       amount='1000', time_in_force='GTC',
+                       order_type='AtMarket', limit=120)
 
     print(cot.bidclose)
 
