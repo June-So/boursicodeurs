@@ -9,7 +9,7 @@ body {
 
 a {
 	color: #222;
-	border-bottom: 1px dashed #000;
+	border-bottom: 1px;
 	text-decoration: none;
 }
 

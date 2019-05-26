@@ -106,7 +106,7 @@ def delete(model_id):
 def bot():
     con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
-    data = con_fxcmpy.get_candles('GER30', period='H1', number=1000)
+    data = con_fxcmpy.get_candles('GER30', period='H1', number=500)
 
     #con.get_open_positions().T
 
@@ -132,18 +132,20 @@ def bot():
     # Pour passer un ordre d'achat ou vente
     if askclose > askopen:
         #con_fxcmpy.create_market_buy_order('GER30', 5)
-        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
-                       rate=105, is_in_pips=False,
-                       amount='1000', time_in_force='GTC',
-                       order_type='AtMarket', limit=120)
+
+        order = con.create_entry_order(symbol='GER30', is_buy=True,
+                               amount=5000, limit=112,
+                               is_in_pips = False,
+                               time_in_force='GTC', rate=110,
+                               stop=None, trailing_step=None)
+
 
     if askclose < askopen:
-        con_fxcmpy.create_market_sell_order('GER30', 5)
-        order = con.open_trade(symbol='GER30', is_buy=True,
-                       rate=105, is_in_pips=False,
-                       amount='1000', time_in_force='GTC',
-                       order_type='AtMarket', limit=120)
-
-    print(cot.bidclose)
+        #con_fxcmpy.create_market_sell_order('GER30', 5)
+        order = con.create_entry_order(symbol='GER30', is_buy=False,
+                               amount=5000, limit=112,
+                               is_in_pips = False,
+                               time_in_force='GTC', rate=110,
+                               stop=None, trailing_step=None)
 
     return render_template('bot.html', cot=cot)

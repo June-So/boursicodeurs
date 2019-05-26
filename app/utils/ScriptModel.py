@@ -43,7 +43,7 @@ def split_data(data):
         valid dataframe
         test dataframe
      """
-    df_train, df_test = train_test_split(data, train_size=0.85, test_size=0.15, shuffle=False)
+    df_train, df_test = train_test_split(data, train_size=0.95, test_size=0.05, shuffle=False)
     df_valid, df_test = train_test_split(df_test, train_size=0.6, test_size=0.4, shuffle=False)
     return df_train, df_valid, df_test
 
