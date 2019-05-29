@@ -33,7 +33,7 @@ class StockPrediction(db.Model):
 
 
 
-class StockHystory(db.Model):
+class StockHistory(db.Model):
     __tablename__ = 'stock_history'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -49,12 +49,26 @@ class StockHystory(db.Model):
     asklow = db.Column(db.Float(asdecimal=True))
     tickqty = db.Column(db.BigInteger)
 
+    def serialize(self):
+        return { 'id': self.id,
+                 'Date': str(self.date),
+                 'bidopen': float(self.bidopen),
+                 'bidclose':  float(self.bidclose),
+                 'bidhigh': float(self.bidhigh),
+                 'bidlow': float(self.bidlow),
+                 'askopen': float(self.askopen),
+                 'askclose': float(self.askclose),
+                 'askhigh': float(self.askhigh),
+                 'asklow': float(self.asklow),
+                 'tickqty ': self.tickqty
+                 }
+
 
 class Asset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     stock_predictions = db.relationship('StockPrediction', backref='asset', cascade="all,delete", lazy=True)
-    stock_historys = db.relationship('StockHystory', backref='asset', cascade="all,delete", lazy=True)
+    stock_historys = db.relationship('StockHistory', backref='asset', cascade="all,delete", lazy=True)
 
     def __init__(self, name):
         self.name = name

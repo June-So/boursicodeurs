@@ -1,4 +1,5 @@
 FXCMY_ACCESS_TOKEN = 'token-access-api-fxcmy'
+FXCMY_SERVER = 'demo'
 DATABASE = {
     'user': 'user',
     'password': 'password',
