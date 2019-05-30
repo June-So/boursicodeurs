@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, url_for
-from app.forms import TrainForm
+from app.forms import TrainForm, BotForm
 from app.models import TrainHistory, StockHistory, StockPrediction
 from app.utils.fxcmManager import connect_fxcm
 
@@ -36,3 +36,9 @@ def stock_history():
 
 
     return render_template('stock-history.html')
+
+
+@app.route('/bot')
+def bot():
+    form = BotForm()
+    return render_template('bot.html', botform=form)

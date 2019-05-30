@@ -1,4 +1,4 @@
-from SECRET import FXCMY_ACCESS_TOKEN,  FXCMY_SERVER
+from SECRET import FXCMY_ACCESS_TOKEN, FXCMY_SERVER
 import fxcmpy
 
 
