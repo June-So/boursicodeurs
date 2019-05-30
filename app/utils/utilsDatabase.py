@@ -18,7 +18,7 @@ def actualize_data(data):
     # on récupère la derniere row inséré dans la base de donnée
     last_value_db = pd.read_sql_query("""SELECT * from stock_history
                                         ORDER BY date
-                                        DESC LIMIT 1;""", engine, index_col='date')
+                                        DESC LIMIT 1;""", engine)
 
     if last_value_df.index.values == last_value_db.index.values:
         flash("La base de donnée est deja a jour...")

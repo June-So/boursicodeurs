@@ -135,6 +135,11 @@ def make_inputs(mat, time_steps):
 
 
 def make_prediction(data, train_history, asset):
+    """
+        :param
+        :train_history instance orm du modèle entrainé à utiliser pour la prédiction
+        :asset  instance orm de l'indice lié à la prédiction
+    """
     K.clear_session()
 
     previousDays = len(data) - train_history.time_steps
@@ -160,17 +165,17 @@ def make_prediction(data, train_history, asset):
     inputs_pred_ds = sc.inverse_transform(inputs_pred.reshape(-1,N_FEATURE))
     real_input_ds = sc.inverse_transform(y_inputs.reshape(-1,N_FEATURE))
 
-    # sauvegarde dans la base de données
-    prediction = pd.DataFrame(inputs_pred_ds)
-    prediction.columns = inputs.columns
+    # sauvegarde  les prédictions dans la base de données
+    # prediction = pd.DataFrame(inputs_pred_ds)
+    # prediction.columns = inputs.columns
+    cotations = dict(zip(inputs.columns, inputs_pred_ds))
+    new_date = inputs.index.values.max() + pd.to_timedelta(1, 'hours')  # ajoute une heure
 
     stock = StockPrediction()
-    stock.add_cotations(**prediction.to_dict())
-    print(type(inputs.index.values.max()))
-    new_date = inputs.index.values.max() + pd.to_timedelta(1,'hours')
-    stock.date = new_date
+    stock.add_cotations(**cotations)
     stock.train_history = train_history
     stock.asset = asset
+    stock.date = new_date
 
     db.session.add(stock)
     db.session.commit()

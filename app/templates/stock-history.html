@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1>Cours de la bourse</h1>
+
+    <div id="dataviz_area"></div>
+<svg id="container"></svg>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{{ url_for('static',filename='js/visualisation.js') }}"></script>
+{% endblock %}
+
