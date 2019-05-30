@@ -27,5 +27,4 @@ def stock_history():
 @app.route('/bot')
 def bot():
 
-    va = "tu y est"
-    return render_template('bot.html', va=va)
+    return render_template('bot.html')
