@@ -3,13 +3,14 @@ import app.utils.ScriptModel as script_model
 import fxcmpy
 from app.forms import TrainForm
 from app.models import TrainHistory, Asset
+from app.utils.fxcmManager import connect_fxcm
 
 def take_position():
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
+    con_fxcmpy = connect_fxcm()
 
     data = con_fxcmpy.get_candles('GER30', period='H1', number=1000)
 
-    #con.get_open_positions().T
+    #con_fxcmpy.get_open_positions().T
 
     model_id = 13
     asset_id = 1
@@ -32,42 +33,21 @@ def take_position():
 
     # Pour passer un ordre d'achat ou vente
     if askclose > askopen:
-        order = con_fxcmpy.create_market_buy_order('GER30', 5)
-        #order = con_fxcmpy.get_order(order_id)
-        #order.set_stop_rate(111, is_in_pips=False)
+        #order = con_fxcmpy.create_market_buy_order('GER30', 5)
 
-        #con_fxcmpy.create_entry_order(symbol='GER30', is_buy=True,
-        #                       amount=5000, limit=112,
-        #                       is_in_pips = False,
-        #                       time_in_force='GTC', rate=110,
-        #                       stop=None, trailing_step=None)
+        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
+                       is_in_pips=False,
+                       amount='5', time_in_force='GTC',
+                       order_type='AtMarket', limit=1.001*askhigh)
 
-        #con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
-        #               rate=105, is_in_pips=False,
-        #               amount='1000', time_in_force='GTC',
-        #               order_type='AtMarket', limit=120)
+    if bidclose < bidopen:
+        #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
+        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=False,
+                       is_in_pips=False,
+                       amount='5', time_in_force='GTC',
+                       order_type='AtMarket', limit=bidlow)
 
-    if askclose < askopen:
-        order = con_fxcmpy.create_market_sell_order('GER30', 5)
-        #order = con_fxcmpy.get_order(order_id)
-        #order.set_stop_rate(111, is_in_pips=False)
-        #con_fxcmpy.create_entry_order(symbol='GER30', is_buy=False,
-        #                       amount=5000, limit=112,
-        #                       is_in_pips = False,
-        #                       time_in_force='GTC', rate=110,
-        #                       stop=None, trailing_step=None)
+    open_position = con_fxcmpy.get_open_positions()
 
-        #con_fxcmpy.open_trade(symbol='GER30', is_buy=False,
-        #               rate=105, is_in_pips=False,
-        #               amount='1000', time_in_force='GTC',
-        #               order_type='AtMarket', limit=120)
-    order_ids = con_fxcmpy.get_order_ids()
-    #order_id = order_ids[-1]
-    return order_ids
-
-def set_limit_stop():
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
-    #order_ids = con_fxcmpy.get_order_ids()
-    order_ids = con_fxcmpy.orders
-    return order_ids
+    return open_position
