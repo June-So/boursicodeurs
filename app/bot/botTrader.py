@@ -38,7 +38,7 @@ def take_position():
         order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
-                       order_type='AtMarket', limit=1.001*askhigh)
+                       order_type='AtMarket', limit=askhigh)
 
     if bidclose < bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
