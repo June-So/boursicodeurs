@@ -6,6 +6,7 @@ from SECRET import *
 from sqlalchemy import create_engine
 from .utils import utilsDatabase
 import app.utils.ScriptModel as script_model
+import app.bot.botTrader as trader
 from app.forms import TrainForm
 from app.models import TrainHistory, Asset
 import os
@@ -16,7 +17,7 @@ def index():
     form = TrainForm()
 
     # connection API fxcmpy
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN_REAL, server='real')
+    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
     # list of instruments, generate choice for get data in view
     instruments = con_fxcmpy.get_instruments()
@@ -100,52 +101,16 @@ def delete(model_id):
     return redirect(url_for('index'))
 
 
-
-
 @app.route('/bot')
 def bot():
-    con_fxcmpy = fxcmpy.fxcmpy(FXCMY_ACCESS_TOKEN, server='demo')
 
-    data = con_fxcmpy.get_candles('GER30', period='H1', number=500)
+    order_ids = trader.set_limit_stop()
+    print(order_ids)
+    return render_template('bot.html', order_ids = order_ids)
 
-    #con.get_open_positions().T
+@app.route('/buy-sell')
+def buy_sell():
 
-    model_id = 10
-    asset_id = 1
+    position = trader.take_position()
 
-    train_history = TrainHistory.query.get(model_id)
-    asset = Asset.query.get(asset_id)
-
-    cot = script_model.make_prediction(data, train_history, asset)
-
-    askopen = cot.askopen
-    askclose = cot.askclose
-    bidopen = cot.bidopen
-    bidclose = cot.bidclose
-
-    askhigh = cot.askhigh
-    asklow = cot.asklow
-    bidhigh = cot.bidhigh
-    bidlow = cot.bidlow
-
-
-    # Pour passer un ordre d'achat ou vente
-    if askclose > askopen:
-        #con_fxcmpy.create_market_buy_order('GER30', 5)
-
-        order = con.create_entry_order(symbol='GER30', is_buy=True,
-                               amount=5000, limit=112,
-                               is_in_pips = False,
-                               time_in_force='GTC', rate=110,
-                               stop=None, trailing_step=None)
-
-
-    if askclose < askopen:
-        #con_fxcmpy.create_market_sell_order('GER30', 5)
-        order = con.create_entry_order(symbol='GER30', is_buy=False,
-                               amount=5000, limit=112,
-                               is_in_pips = False,
-                               time_in_force='GTC', rate=110,
-                               stop=None, trailing_step=None)
-
-    return render_template('bot.html', cot=cot)
+    return redirect(url_for('bot'))
