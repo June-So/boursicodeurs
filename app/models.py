@@ -38,7 +38,7 @@ class StockHistory(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     asset_id = db.Column(db.Integer, db.ForeignKey('asset.id'), nullable=False)
-    date = db.Column(db.DateTime, index=True)
+    date = db.Column(db.DateTime)
     bidopen = db.Column(db.Float(asdecimal=True))
     bidclose = db.Column(db.Float(asdecimal=True))
     bidhigh = db.Column(db.Float(asdecimal=True))
