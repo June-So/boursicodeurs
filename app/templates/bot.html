@@ -1,4 +1,14 @@
 {% extends 'base.html' %}
 {% block body %}
-  <a href="{{ url_for('buy_sell') }}"><button>Achat/Vente</button></a>
+
+    <a href="{{ url_for('buy_sell') }}"><button>Achat/Vente</button></a>
+
+    <form class="" action="{{ url_for('free_trader')}}" method="POST">
+      {{ botform.time_trade.label() }}
+      {{ botform.time_trade }}
+      {{botform.submit}}
+    </form>
+
+
+
 {% endblock %}

@@ -1,7 +1,7 @@
 from SECRET import *
 import app.utils.ScriptModel as script_model
 import fxcmpy
-from app.forms import TrainForm
+from app.forms import TrainForm, BotForm
 from app.models import TrainHistory, Asset
 from app.utils.fxcmManager import connect_fxcm
 
@@ -20,15 +20,15 @@ def take_position():
 
     cot = script_model.make_prediction(data, train_history, asset)
 
-    askopen = cot.askopen
-    askclose = cot.askclose
-    bidopen = cot.bidopen
-    bidclose = cot.bidclose
+    askopen = float(cot.askopen)
+    askclose = float(cot.askclose)
+    bidopen = float(cot.bidopen)
+    bidclose = float(cot.bidclose)
 
-    askhigh = cot.askhigh
-    asklow = cot.asklow
-    bidhigh = cot.bidhigh
-    bidlow = cot.bidlow
+    askhigh = float(cot.askhigh)
+    asklow = float(cot.asklow)
+    bidhigh = float(cot.bidhigh)
+    bidlow = float(cot.bidlow)
 
 
     # Pour passer un ordre d'achat ou vente
@@ -38,7 +38,7 @@ def take_position():
         order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
-                       order_type='AtMarket', limit=askhigh)
+                       order_type='AtMarket', limit=1.001*askhigh)
 
     if bidclose < bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
@@ -51,3 +51,11 @@ def take_position():
     open_position = con_fxcmpy.get_open_positions()
 
     return open_position
+
+
+def take_position_free(time):
+    time = int(time)
+    while time > 0:
+        rep = print("j'ai passé ",time,"position")
+        time = time - 1
+    return rep
