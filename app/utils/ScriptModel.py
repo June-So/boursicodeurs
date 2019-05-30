@@ -166,13 +166,13 @@ def make_prediction(data, train_history, asset):
     real_input_ds = sc.inverse_transform(y_inputs.reshape(-1,N_FEATURE))
 
     # sauvegarde  les prédictions dans la base de données
-    # prediction = pd.DataFrame(inputs_pred_ds)
-    # prediction.columns = inputs.columns
+    prediction = pd.DataFrame(inputs_pred_ds)
+    prediction.columns = inputs.columns
     cotations = dict(zip(inputs.columns, inputs_pred_ds))
     new_date = inputs.index.values.max() + pd.to_timedelta(1, 'hours')  # ajoute une heure
 
     stock = StockPrediction()
-    stock.add_cotations(**cotations)
+    stock.add_cotations(**prediction.to_dict())
     stock.train_history = train_history
     stock.asset = asset
     stock.date = new_date
