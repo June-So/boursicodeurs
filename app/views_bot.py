@@ -2,6 +2,7 @@ from app import app
 from flask import request, flash, redirect, url_for
 from app.bot.botTrader import take_position
 import time
+import datetime as dt
 
 
 @app.route('/buy-sell')
@@ -12,12 +13,24 @@ def buy_sell():
 
 @app.route('/free-trader',methods=['GET', 'POST'])
 def free_trader():
+    con_fxcmpy = connect_fxcm()
     if request.method == 'POST':
         temps = request.form['time_trade']
         temps = int(temps)
         while temps > 0:
-            position = take_position()
-            #print("j'ai passé ",temps,"position")
-            time.sleep(300)
-            temps = temps - 1
+            minute_actual = dt.datetime.now().time().minute
+            minut_restant = minute_actual%5
+            if minut_restant == 0:
+                position = take_position()
+                time.sleep(300)
+                tradeId = position['tradeId'][0]
+                con_fxcmpy.close_all()
+            else:
+                sec_restant = (minut_restant)*60
+                min_restant=300-sec_restant
+                position = take_position()
+                time.sleep(min_restant)
+                tradeId = position['tradeId'][0]
+                con_fxcmpy.close_all()
+            temps = temps-1
     return redirect(url_for('bot'))

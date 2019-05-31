@@ -3,17 +3,18 @@ import app.utils.ScriptModel as script_model
 from app.forms import TrainForm, BotForm
 from app.models import TrainHistory, Asset
 from app.utils.fxcmManager import connect_fxcm
+import datetime as dt
 
 INSTRUMENT = 'GER30'
 
 def take_position():
     con_fxcmpy = connect_fxcm()
 
-    data = con_fxcmpy.get_candles(INSTRUMENT, period='H1', number=1000)
+    data = con_fxcmpy.get_candles('GER30', period='m5', number=1000)
 
     #con_fxcmpy.get_open_positions().T
 
-    model_id = 13
+    model_id = 16
     asset_id = 1
 
     train_history = TrainHistory.query.get(model_id)
@@ -36,18 +37,18 @@ def take_position():
     if bidclose > bidopen:
         #order = con_fxcmpy.create_market_buy_order('GER30', 5)
 
-        order = con_fxcmpy.open_trade(symbol=INSTRUMENT ,is_buy=True,
+        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
-                       order_type='AtMarket', limit=1.001*askhigh)
+                       order_type='AtMarket', limit=askhigh, stop=asklow)
 
     if bidclose < bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
-        order = con_fxcmpy.open_trade(symbol=INSTRUMENT, is_buy=False,
+        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=False,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
-                       order_type='AtMarket', limit=bidlow)
+                       order_type='AtMarket', limit=bidlow, stop=bidhigh)
 
     open_position = con_fxcmpy.get_open_positions()
 
