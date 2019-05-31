@@ -62,7 +62,7 @@
     <div>
         <h2>Liste des indices</h2>
         {% for instrument in instruments %}
-            <button type="button" class="btn btn-info"><a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a></button>
+            <button type="button" class="btn btn-info"><a href="{{ url_for('get_data', instrument=instrument, period='m5', number=10000)}}">{{ instrument }}</a></button>
         {% endfor %}
     </div>
 {% endblock %}
