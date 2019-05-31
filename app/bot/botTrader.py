@@ -1,14 +1,15 @@
 from SECRET import *
 import app.utils.ScriptModel as script_model
-import fxcmpy
 from app.forms import TrainForm, BotForm
 from app.models import TrainHistory, Asset
 from app.utils.fxcmManager import connect_fxcm
 
+INSTRUMENT = 'GER30'
+
 def take_position():
     con_fxcmpy = connect_fxcm()
 
-    data = con_fxcmpy.get_candles('GER30', period='H1', number=1000)
+    data = con_fxcmpy.get_candles(INSTRUMENT, period='H1', number=1000)
 
     #con_fxcmpy.get_open_positions().T
 
@@ -32,10 +33,10 @@ def take_position():
 
 
     # Pour passer un ordre d'achat ou vente
-    if askclose > askopen:
+    if bidclose > bidopen:
         #order = con_fxcmpy.create_market_buy_order('GER30', 5)
 
-        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
+        order = con_fxcmpy.open_trade(symbol=INSTRUMENT ,is_buy=True,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=1.001*askhigh)
@@ -43,7 +44,7 @@ def take_position():
     if bidclose < bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
-        order = con_fxcmpy.open_trade(symbol='GER30', is_buy=False,
+        order = con_fxcmpy.open_trade(symbol=INSTRUMENT, is_buy=False,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=bidlow)
