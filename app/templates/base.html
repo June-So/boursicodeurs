@@ -10,37 +10,37 @@
 </head>
 
 <body>
-<div class="container-fluid">
-          <header class="row text-white">
-                <h1>Boursicodeurs</h1>
-                <p>Site en construction</p>
-          </header>
-{% include 'includes/navbar.html' %}
+    <div class="container-fluid">
+              <header class="row text-white">
+                    <h1>Boursicodeurs</h1>
+                    <p>Site en construction</p>
+              </header>
+        {% include 'includes/navbar.html' %}
 
-    <!-- Messages flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-                <div class="alert alert-info"
-                        <ul class=flashes>
-                                {% for category, message in messages %}
-                                    <li class="{{ category }}">{{ message }}</li>
-                                {% endfor %}
-                        </ul>
-                </div>
-          {% endif %}
-    {% endwith %}
+        <!-- Messages flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                    <div class="alert alert-info"
+                            <ul class=flashes>
+                                    {% for category, message in messages %}
+                                        <li class="{{ category }}">{{ message }}</li>
+                                    {% endfor %}
+                            </ul>
+                    </div>
+              {% endif %}
+        {% endwith %}
 
 
-      <div class="p-5">
-            <!-- main content -->
-            {% block body %}
-            {% endblock %}
-      </div>
+          <div class="p-5">
+                <!-- main content -->
+                {% block body %}
+                {% endblock %}
+          </div>
 
-      <footer class="row text-white">
-            <p>L'appli des Boursicodeurs fait par des Boursicodeurs pour les Boursicodeurs</p>
-      </footer>
-</div>
+          <footer class="row text-white">
+                <p>L'appli des Boursicodeurs fait par des Boursicodeurs pour les Boursicodeurs</p>
+          </footer>
+    </div>
 
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>

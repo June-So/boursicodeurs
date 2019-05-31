@@ -2,9 +2,32 @@
 
 {% block body %}
     <h1>Cours de la bourse</h1>
-    <img  src="{{ url_for('static', filename='img/stock-history.png') }}"/>
+<div class="row">
+    <div class="col-6">
+         <img  src="{{ url_for('static', filename='img/stock-history.png') }}"/>
+    </div>
+    <div class="col-6">
+        <table class="table">
+            <thead class="thead-light">
+                <tr>
+                    <td>Date</td>
+                    <td>Model</td>
+                    <td>askclose</td>
+                </tr>
+            </thead>
+            {% for predict in predictions %}
+            <tr>
+                <td>{{ predict.date }} </td>
+                <td>{{ predict.train_history.id }} </td>
+                <td>{{ predict.askclose }} </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
     <div id="dataviz_area"></div>
-<svg id="container"></svg>
+    <svg id="container"></svg>
 {% endblock %}
 
 {% block javascript %}

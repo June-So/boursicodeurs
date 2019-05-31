@@ -17,18 +17,26 @@ def index():
 def stock_history():
     stock_history = StockHistory.query.all()
     stock_predictions = StockPrediction.query.all()
-    print('hellllllo')
     limit = 100
-    data = stock_history[-24:]
+    data = stock_history[-50:]
+    plt.figure()
+
     dates_real = [stock.date for stock in data]
-    dates_predict = [stock.date for stock in stock_predictions]
-    askopen_real = [stock.askopen for stock in data]
-    askopen_predict = [stock.askopen for stock in stock_predictions]
-    plt.plot(dates_real, askopen_real)
-    plt.plot(dates_predict, askopen_predict, c='red')
+    y_real = [stock.askclose for stock in data]
+    plt.plot(dates_real,  y_real, label='real')
+
+    models = [ predict.train_history.id  for predict in stock_predictions]
+    models_ids = list(dict.fromkeys(models))
+
+    for model_id in models_ids:
+        dates_predict = [stock.date for stock in stock_predictions if stock.train_history.id == model_id]
+        y_predict = [stock.bidclose for stock in stock_predictions if stock.train_history.id == model_id]
+        plt.plot(dates_predict, y_predict, label='prediction_'+str(model_id))
+
+    plt.legend()
     plt.savefig('app/static/img/stock-history.png')
 
-    return render_template('stock-history.html')
+    return render_template('stock-history.html', predictions=stock_predictions)
 
 
 @app.route('/bot')
