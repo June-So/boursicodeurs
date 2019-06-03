@@ -14,10 +14,19 @@ def train_model():
         time_step = request.form['time_steps']
         batch_size = request.form['batch_size']
 
-        # Entrainement du model
-        script_model.train_model(epochs=int(epochs), batch_size=int(batch_size), time_steps=int(time_step))
+        # Si un fichier .hd5 a été envoyé --> Ne pas entrainer le modèle -> passer à la phase de sauvegarde
+        # check if the post request has the file part
 
-        flash('Le modèle à bien été entraîné')
+        if request.files:
+                file = request.files['filename']
+                filename = 'import_' + file.filename
+                file.save('app/models/' + filename)
+                script_model.train_model(epochs=int(epochs), batch_size=int(batch_size), time_steps=int(time_step), filename=filename)
+                os.remove('app/models/' + filename)
+                flash('Le modèle à bien été ajouté')
+        else:
+                script_model.train_model(epochs=int(epochs), batch_size=int(batch_size), time_steps=int(time_step))
+                flash('Le modèle à bien été entraîné')
         return redirect(url_for('index'))
 
     return 'Vous ne devriez pas être là.. Passez par le formulaire !'

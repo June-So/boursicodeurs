@@ -169,41 +169,40 @@ def make_prediction(data, train_history, asset):
     return stock
 
 
-def train_model(epochs, batch_size, time_steps):
+def train_model(epochs, batch_size, time_steps, filename=False):
     """this function allowed to train model"""
     K.clear_session()
+    # -- GET DATA
     data = get_data_on_db()
 
+    # -- SPLIT DATA
     dataset_train, dataset_valid, dataset_test = split_data(data)
 
+    # -- PREPROCESSING
     train_sc, sc = normalize_data(dataset_train)
-
     valid_sc = sc.transform(dataset_valid)
-
     test_sc = sc.transform(dataset_test)
-
-
     # faire des données X_train et y_train
     X_train, y_train = make_timeseries(train_sc, time_steps)
-
     X_valid, y_valid = make_timeseries(valid_sc, time_steps)
-
     X_test, y_test = make_timeseries(test_sc, time_steps)
 
-    ## Save history
+    # -- SAVE MODEL IN DATABASE ( PART I )
     train_history = TrainHistory(epochs=epochs, time_steps=time_steps, batch_size=batch_size)
     train_history.total_train = X_train.shape[0]
     train_history.total_validation = X_valid.shape[0]
     train_history.total_test = X_test.shape[0]
     db.session.add(train_history)
     db.session.commit()
-
     train_history.filename = 'modelDAX_Hour' + str(train_history.id) + '.hdf5'
-    db.session.commit()
 
+    # -- TRAINING
+    if filename:
+        model_trained = loaded_model(filename, train_history.time_steps)
+    else:
+        model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps, train_history=train_history)
 
-    model_trained = fit_model(X_train, y_train, X_valid, y_valid, epochs = epochs, batch_size= batch_size, time_steps= time_steps, train_history=train_history)
-
+    # -- PREDICTIONS TEST
     # Prediction sur les données du train suivi de sa descalisation
     y_pred_train = model_trained.predict(X_train)
     y_pred_train = y_pred_train.reshape(-1,N_FEATURE)
@@ -219,12 +218,15 @@ def train_model(epochs, batch_size, time_steps):
     y_pred_test = y_pred_test.reshape(-1,N_FEATURE)
     y_pred_test_ds = sc.inverse_transform(y_pred_test)
 
+    # -- SCORES
     # metrics du models
     rmse_train = round(np.sqrt(mean_squared_error(y_pred_train, y_train.reshape(-1,N_FEATURE))),3)
     rmse_valid = round(np.sqrt(mean_squared_error(y_pred_valid, y_valid.reshape(-1,N_FEATURE))),3)
     rmse_test = round(np.sqrt(mean_squared_error(y_pred_test, y_test.reshape(-1,N_FEATURE))),3)
 
-    # insertion des metrics dans la base de donnée
+
+
+    # -- SAVE METRICS IN DATABASE ( PART I I)
     train_history.score_train = rmse_train
     train_history.score_validation = rmse_valid
     train_history.score_test = rmse_test
