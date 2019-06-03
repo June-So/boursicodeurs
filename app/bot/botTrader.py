@@ -14,7 +14,7 @@ def take_position():
 
     #con_fxcmpy.get_open_positions().T
 
-    model_id = 16
+    model_id = 13
     asset_id = 1
 
     train_history = TrainHistory.query.get(model_id)
@@ -34,7 +34,7 @@ def take_position():
 
 
     # Pour passer un ordre d'achat ou vente
-    if bidclose > bidopen:
+    if askclose > askopen:
         #order = con_fxcmpy.create_market_buy_order('GER30', 5)
 
         order = con_fxcmpy.open_trade(symbol='GER30', is_buy=True,
@@ -42,7 +42,7 @@ def take_position():
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=askhigh, stop=asklow)
 
-    if bidclose < bidopen:
+    if askclose < askopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
         order = con_fxcmpy.open_trade(symbol='GER30', is_buy=False,
