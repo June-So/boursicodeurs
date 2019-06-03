@@ -3,7 +3,8 @@
 
     <div class="col-12">
       <h2 class="mb-2">Création de modèle</h2>
-      <form method="POST" action="{{ url_for('train_model') }}" class="form-inline">
+      <form method="POST" action="{{ url_for('train_model') }}" class="form-inline"enctype=multipart/form-data>
+
           {{ trainform.hidden_tag() }}
           <div class="form-group">
             {{ trainform.epochs.label() }}
@@ -17,6 +18,7 @@
             {{ trainform.time_steps.label() }}
             {{ trainform.time_steps (class="form-control")}}
           </div>
+                <input type="file" name="filename">
             {{ trainform.submit(class='btn btn-primary') }}
       </form>
     </div>
