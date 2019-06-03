@@ -3,7 +3,14 @@
     <div class="row">
         <div class="col-12 mb-3">
             <h2>Actions du bot</h2>
-            <a href="{{ url_for('buy_sell') }}"><button class="btn btn-light border">Achat/Vente</button></a>
+            <form action="{{ url_for('buy_sell') }}" method="POST">
+                <select name="model" size="1">
+                    {% for model in models %}
+                    <option value="{{ model.id }} ">{{ model.filename }}</option>
+                    {% endfor %}
+                </select>
+                <input type="submit" class="btn btn-light border" name="submit" value="Achat/Vente"/>
+            </form>
         </div>
         <div class="col-12">
             <h2>Paramètres du bot</h2>
