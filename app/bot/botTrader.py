@@ -2,20 +2,9 @@ import app.utils.ScriptModel as script_model
 from app.models import TrainHistory, Asset
 from app.utils.fxcmManager import connect_fxcm
 
-def take_position(model_id=13, asset_id=1, period='H1'):
+def take_position(model_id=17, asset_id=1, period='H1'):
     # -- GET DATA ---- Récupérer les dernières données
     con_fxcmpy = connect_fxcm()
-<<<<<<< HEAD
-
-    data = con_fxcmpy.get_candles('GER30', period='m5', number=1000)
-
-    #con_fxcmpy.get_open_positions().T
-
-    model_id = 13
-    asset_id = 1
-
-=======
->>>>>>> 69e2024099f4b5919d7167c129f26053aa50afde
     train_history = TrainHistory.query.get(model_id)
     asset = Asset.query.get(asset_id)
     data = con_fxcmpy.get_candles(asset.name, period=period, number=1000)
