@@ -5,9 +5,8 @@ import numpy as np
 from sqlalchemy import create_engine
 from app import db
 from sklearn.preprocessing import MinMaxScaler
-from app.models import TrainHistory, StockPrediction
 from keras.models import Sequential
-from keras.layers import Dense, Dropout
+from keras.layers import Dense
 from keras.callbacks import ModelCheckpoint
 from keras.optimizers import Adam
 from keras.layers import LSTM
@@ -16,7 +15,8 @@ from keras.layers import TimeDistributed
 from sklearn.model_selection import train_test_split
 from keras import backend as K
 from sklearn.metrics import mean_squared_error
-from app.models import TrainHistory, Asset
+from app.models import TrainHistory
+from app.utils.utilsDatabase import  save_prediction
 
 #time_steps = 100
 #backsize = 32
@@ -137,15 +137,14 @@ def make_inputs(mat, time_steps):
 def make_prediction(data, train_history, asset):
     """
         :param
+        :data
         :train_history instance orm du modèle entrainé à utiliser pour la prédiction
         :asset  instance orm de l'indice lié à la prédiction
     """
     K.clear_session()
 
+    # l'entrée est constituée des derniers jour récupérés
     previousDays = len(data) - train_history.time_steps
-
-
-    # l'entrée est contitué des derniers jour récupérés
     inputs = data.iloc[previousDays:]
 
     # on reformate l'entré pour que l'entrée corresponde à l'entré du model
@@ -165,20 +164,7 @@ def make_prediction(data, train_history, asset):
     inputs_pred_ds = sc.inverse_transform(inputs_pred.reshape(-1,N_FEATURE))
     real_input_ds = sc.inverse_transform(y_inputs.reshape(-1,N_FEATURE))
 
-    # sauvegarde  les prédictions dans la base de données
-    prediction = pd.DataFrame(inputs_pred_ds)
-    prediction.columns = inputs.columns
-    cotations = dict(zip(inputs.columns, inputs_pred_ds))
-    new_date = inputs.index.values.max() + pd.to_timedelta(1, 'hours')  # ajoute une heure
-
-    stock = StockPrediction()
-    stock.add_cotations(**prediction.to_dict())
-    stock.train_history = train_history
-    stock.asset = asset
-    stock.date = new_date
-
-    db.session.add(stock)
-    db.session.commit()
+    stock = save_prediction(inputs_pred_ds, inputs, asset, train_history)
 
     return stock
 

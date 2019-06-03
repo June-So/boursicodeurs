@@ -2,7 +2,7 @@ from SECRET import *
 from sqlalchemy import create_engine
 from flask import flash
 import pandas as pd
-from app.models import Asset, TrainHistory
+from app.models import Asset, TrainHistory, StockPrediction
 from app import db
 
 def actualize_data(data):
@@ -18,7 +18,7 @@ def actualize_data(data):
     # on récupère la derniere row inséré dans la base de donnée
     last_value_db = pd.read_sql_query("""SELECT * from stock_history
                                         ORDER BY date
-                                        DESC LIMIT 1;""", engine)
+                                        DESC LIMIT 1;""", engine, index_col='date')
 
     if last_value_df.index.values == last_value_db.index.values:
         flash("La base de donnée est deja a jour...")
@@ -46,3 +46,28 @@ def get_asset(instrument):
         db.session.commit()
 
     return asset
+
+
+def save_prediction(x_pred, x_previous, asset, model):
+    """
+    :param x_pred:
+    :param x_previous:
+    :param asset:
+    :param model:
+    :return:
+    """
+    # sauvegarde  de la prédiction dans la base de données
+    prediction = pd.DataFrame(x_pred)
+    prediction.columns = x_previous.columns
+    new_date = x_previous.index.values.max() + pd.to_timedelta(1, 'hours')  # ajoute une heure
+
+    stock = StockPrediction()
+    stock.add_cotations(**prediction.to_dict())
+    stock.train_history = model
+    stock.asset = asset
+    stock.date = new_date
+
+    db.session.add(stock)
+    db.session.commit()
+
+    return stock

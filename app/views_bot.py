@@ -5,9 +5,11 @@ import time
 import datetime as dt
 
 
-@app.route('/buy-sell')
+@app.route('/buy-sell', methods=['GET', 'POST'])
 def buy_sell():
-    position = take_position()
+    if request.method == 'POST':
+        model_id = request.form['model']
+        position = take_position(model_id=model_id)
     flash(f"recap des positions ouvertes {position}")
     return redirect(url_for('bot'))
 

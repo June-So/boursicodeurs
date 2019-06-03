@@ -4,7 +4,8 @@ from app.forms import TrainForm, BotForm
 from app.models import TrainHistory, StockHistory, StockPrediction, Asset
 from app.utils.fxcmManager import connect_fxcm
 
-import  matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
 
 @app.route('/')
 def index():
@@ -12,6 +13,7 @@ def index():
     form = TrainForm()
     list_models = TrainHistory.query.all()
     return render_template('index.html',  trainform=form, list_models=list_models)
+
 
 @app.route('/stock-history')
 def stock_history():
@@ -42,7 +44,8 @@ def stock_history():
 @app.route('/bot')
 def bot():
     form = BotForm()
-    return render_template('bot.html', botform=form)
+    models = TrainHistory.query.all()
+    return render_template('bot.html', botform=form, models=models)
 
 
 @app.route('/liste-indices')
