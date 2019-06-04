@@ -1,24 +1,54 @@
 {% extends 'base.html' %}
 {% block body %}
     <div class="row">
-        <div class="col-12 mb-3">
-            <h2>Actions du bot</h2>
-            <form action="{{ url_for('buy_sell') }}" method="POST">
-                <select name="model" size="1">
-                    {% for model in models %}
-                    <option value="{{ model.id }} ">{{ model.filename }}</option>
-                    {% endfor %}
-                </select>
-                <input type="submit" class="btn btn-light border" name="submit" value="Achat/Vente"/>
-            </form>
+
+        <div class="col-6 row">
+            <div class="col-12 mb-3">
+                <h2>Actions du bot</h2>
+                <form action="{{ url_for('buy_sell') }}" method="POST">
+                    <select name="model" size="1">
+                        {% for model in models %}
+                        <option value="{{ model.id }} ">{{ model.filename }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="submit" class="btn btn-light border" name="submit" value="Achat/Vente"/>
+                </form>
+            </div>
+
+            <div class="col-12">
+                <h2>Paramètres du bot</h2>
+                <form action="{{ url_for('free_trader')}}" method="POST">
+                  {{ botform.time_trade.label() }}
+                  {{ botform.time_trade }}
+                    <select name="model" size="1">
+                        {% for model in models %}
+                        <option value="{{ model.id }} ">{{ model.filename }}</option>
+                        {% endfor %}
+                    </select>
+                  {{ botform.submit }}
+                </form>
+            </div>
         </div>
-        <div class="col-12">
-            <h2>Paramètres du bot</h2>
-            <form action="{{ url_for('free_trader')}}" method="POST">
-              {{ botform.time_trade.label() }}
-              {{ botform.time_trade }}
-              {{ botform.submit }}
-            </form>
+
+        <div class="col-6">
+            <table class="table">
+                <tr>
+                    <th>date de l'action</th>
+                    <th>action</th>
+                        <th>bidopen prédit</th>
+                        <th>bidclose prédit</th>
+                </tr>
+            <tr>
+                {% for action in bot_actions %}
+                    <td>{{ action.date }}</td>
+                    <td>{{ action.bot_cat_action.name }}</td>
+                {% for prediction in action.predictions %}
+                        <td> {{ prediction.bidopen }} </td>
+                        <td> {{ prediction.bidclose }}  </td>
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+                </table>
         </div>
     </div>
 

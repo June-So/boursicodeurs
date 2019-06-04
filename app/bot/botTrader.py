@@ -1,8 +1,20 @@
 import app.utils.ScriptModel as script_model
-from app.models import TrainHistory, Asset
+from app.models import TrainHistory, Asset, BotAction
 from app.utils.fxcmManager import connect_fxcm
+from app.utils.utilsDatabase import  save_action
+
+STATE_BUY = 1
+STATE_SELL = 2
+STATE_NONE = 3
+
 
 def take_position(model_id=17, asset_id=1, period='H1'):
+    """
+    :param model_id:  id du model à utiliser
+    :param asset_id:  id de l'indice sur lequel se placer
+    :param period:
+    :return:
+    """
     # -- GET DATA ---- Récupérer les dernières données
     con_fxcmpy = connect_fxcm()
     train_history = TrainHistory.query.get(model_id)
@@ -13,7 +25,8 @@ def take_position(model_id=17, asset_id=1, period='H1'):
     #con_fxcmpy.get_open_positions().
     cot = script_model.make_prediction(data, train_history, asset)
 
-    # Pour passer un ordre d'achat ou vente
+    # -- MAKE DECISION (from prediction) ---------
+    # Condition d'ordre d'achat, revente automatique selon limite
     if cot.bidclose > cot.bidopen:
         #order = con_fxcmpy.create_market_buy_order('GER30', 5)
 
@@ -21,7 +34,9 @@ def take_position(model_id=17, asset_id=1, period='H1'):
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=cot.askhigh, stop=cot.asklow)
+        save_action(STATE_BUY, cot)
 
+    # Condition de ???
     if cot.bidclose < cot.bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
@@ -29,8 +44,14 @@ def take_position(model_id=17, asset_id=1, period='H1'):
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=cot.bidlow, stop=cot.bidhigh)
+        save_action(STATE_NONE, cot)
+
+    # -- SAVE DECISION
+
 
     open_position = con_fxcmpy.get_open_positions()
+    print(order)
+    print(open_position)
 
     return open_position
 

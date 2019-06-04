@@ -2,7 +2,7 @@ from SECRET import *
 from sqlalchemy import create_engine
 from flask import flash
 import pandas as pd
-from app.models import Asset, TrainHistory, StockPrediction
+from app.models import Asset, TrainHistory, StockPrediction, BotAction, BotCatAction
 from app import db
 
 def actualize_data(data):
@@ -71,3 +71,14 @@ def save_prediction(x_pred, x_previous, asset, model):
     db.session.commit()
 
     return stock
+
+
+def save_action(action_id, cot):
+    action = BotCatAction.query.get(action_id)
+    bot_action = BotAction()
+    bot_action.predictions.append(cot)
+    bot_action.bot_cat_action = action
+    db.session.add(bot_action)
+    db.session.commit()
+
+    return bot_action
