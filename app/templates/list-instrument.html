@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
-    <div>
+    <div class="row">
+        <div class="col-12">
         <h2>Actualiser vos indices</h2>
         <ul class="list-group">
         {% for asset in assets %}
@@ -8,12 +9,12 @@
         {% endfor %}
         </ul>
     </div>
-    <div>
-        <h2>Liste des indices</h2>
-        <ul class="list-group">
-        {% for instrument in instruments %}
-            <li class="list-group-item"><a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a></li>
-        {% endfor %}
-        </ul>
     </div>
+
+<div class="row">
+    <h2>Indices Fxcm</h2>
+    <div id="instruments-fxcm" class="col-12">
+        <button id="btn-load-instruments" class="btn btn-primary">Voir tout les indices</button>
+    </div>
+</div>
 {% endblock %}

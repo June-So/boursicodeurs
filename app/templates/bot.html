@@ -30,6 +30,7 @@
             </div>
         </div>
 
+        <!-- Tableau des actions précédentes -->
         <div class="col-6">
             <table class="table">
                 <tr>
@@ -38,16 +39,18 @@
                         <th>bidopen prédit</th>
                         <th>bidclose prédit</th>
                 </tr>
-            <tr>
+
                 {% for action in bot_actions %}
+                <tr>
                     <td>{{ action.date }}</td>
                     <td>{{ action.bot_cat_action.name }}</td>
-                {% for prediction in action.predictions %}
-                        <td> {{ prediction.bidopen }} </td>
-                        <td> {{ prediction.bidclose }}  </td>
+                    {% for prediction in action.predictions %}
+                    <td> {{ prediction.bidopen }} </td>
+                    <td> {{ prediction.bidclose }}  </td>
                     {% endfor %}
+                    <td>{{ action.predictions }}</td>
+                </tr>
                 {% endfor %}
-            </tr>
                 </table>
         </div>
     </div>

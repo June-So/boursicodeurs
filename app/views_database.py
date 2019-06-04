@@ -1,10 +1,17 @@
 from app import app
-from flask import request
+from flask import request, render_template
 from .utils import utilsDatabase
 from app.utils.fxcmManager import connect_fxcm
 from app.models import StockHistory
 import json
 import jsonify
+
+@app.route('/load-instruments')
+def get_instruments():
+    # connection API fxcmpy
+    instruments = connect_fxcm().get_instruments()
+    return render_template('includes/instruments-fxcm.html', instruments=instruments)
+
 
 @app.route('/get-data-<instrument>', methods=['GET'])
 def get_data(instrument):
