@@ -1,0 +1,5 @@
+<ul class="list-group">
+{% for instrument in instruments %}
+    <li class="list-group-item"><a href="{{ url_for('get_data', instrument=instrument, period='H1', number=10000)}}">{{ instrument }}</a></li>
+{% endfor %}
+</ul>

@@ -1,7 +1,7 @@
 from app import app
 from flask import render_template
 from app.forms import TrainForm, BotForm
-from app.models import TrainHistory, StockHistory, StockPrediction, Asset
+from app.models import TrainHistory, StockHistory, StockPrediction, Asset, BotAction
 from app.utils.fxcmManager import connect_fxcm
 
 import matplotlib.pyplot as plt
@@ -17,26 +17,36 @@ def index():
 
 @app.route('/stock-history')
 def stock_history():
-    stock_history = StockHistory.query.all()
-    stock_predictions = StockPrediction.query.all()
-    limit = 100
-    data = stock_history[-50:]
+    limit = -20
     plt.figure()
 
-    dates_real = [stock.date for stock in data]
-    y_real = [stock.askclose for stock in data]
+    # plot history
+    stock_history = StockHistory.query.order_by(StockHistory.date.asc()).all()
+    dates_real = [stock.date for stock in stock_history]
+    y_real = [stock.askclose for stock in stock_history]
     plt.plot(dates_real,  y_real, label='real')
 
-    models = [ predict.train_history.id  for predict in stock_predictions]
+    # plot predictions par model
+    stock_predictions = StockPrediction.query.order_by(StockPrediction.date.asc()).all()
+    models = [ predict.train_history.id for predict in stock_predictions ]
     models_ids = list(dict.fromkeys(models))
-
     for model_id in models_ids:
         dates_predict = [stock.date for stock in stock_predictions if stock.train_history.id == model_id]
         y_predict = [stock.bidclose for stock in stock_predictions if stock.train_history.id == model_id]
-        plt.plot(dates_predict, y_predict, label='prediction_'+str(model_id))
+        plt.plot(dates_predict, y_predict,  label='prediction_' + str(model_id))
 
-    plt.legend()
-    plt.savefig('app/static/img/stock-history.png')
+    # plot des actions
+    bot_actions = BotAction.query.order_by(BotAction.date.asc()).all()
+    x = [action.date for action in bot_actions]
+    x_format = [action.date.strftime('%d/%m/%Y %H') for action in bot_actions]
+    y = [history.askclose for history in stock_history if history.date.strftime('%d/%m/%Y %H') in x_format] #[ action.predictions[0].bidclose for action in bot_actions ]
+    print(x_format)
+    print([history for history in stock_history if history.date.strftime('%d/%m/%Y %H') in x_format])
+    print(len(x), len(y))
+    #plt.scatter(x, y)
+
+    #plt.legend()
+    #plt.savefig('app/static/img/stock-history.png')
 
     return render_template('stock-history.html', predictions=stock_predictions)
 
@@ -45,15 +55,14 @@ def stock_history():
 def bot():
     form = BotForm()
     models = TrainHistory.query.all()
-    return render_template('bot.html', botform=form, models=models)
+    bot_actions = BotAction.query.all()
+    return render_template('bot.html', botform=form, models=models, bot_actions=bot_actions)
 
 
 @app.route('/liste-indices')
 def list_instrument():
     # connection API fxcmpy
-    con_fxcmpy = connect_fxcm()
     assets = Asset.query.all()
     # list of instruments, generate choice for get data in view
-    instruments = con_fxcmpy.get_instruments()
-    return render_template('list-instrument.html', instruments=instruments, assets=assets)
+    return render_template('list-instrument.html', assets=assets)
 

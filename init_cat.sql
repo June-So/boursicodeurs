@@ -1,0 +1,1 @@
+INSERT INTO `bot_cat_action` (`id`, `name`) VALUES (NULL, 'ACHAT'), (NULL, 'VENTE'), (NULL, 'AUCUNE ACTION');

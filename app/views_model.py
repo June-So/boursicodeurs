@@ -17,7 +17,7 @@ def train_model():
         # Si un fichier .hd5 a été envoyé --> Ne pas entrainer le modèle -> passer à la phase de sauvegarde
         # check if the post request has the file part
 
-        if request.files:
+        if request.files['filename']:
                 file = request.files['filename']
                 filename = 'import_' + file.filename
                 file.save('app/models/' + filename)
