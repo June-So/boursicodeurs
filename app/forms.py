@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SubmitField
+from wtforms import IntegerField, SubmitField, TextField
 
 
 class TrainForm(FlaskForm):
@@ -11,4 +11,11 @@ class TrainForm(FlaskForm):
 
 class BotForm(FlaskForm):
     time_trade = IntegerField('time trade')
+    model_name = TextField('nom model')
     submit = SubmitField("Lancer le botTrader")
+
+
+class BotDqlForm(FlaskForm):
+    time_trade = IntegerField('time trade')
+    model_name = TextField('nom model')
+    submit = SubmitField("Lancer le DqlTrader")

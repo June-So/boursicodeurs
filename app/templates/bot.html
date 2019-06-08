@@ -28,6 +28,19 @@
                   {{ botform.submit }}
                 </form>
             </div>
+
+
+            <div class="col-12">
+                <h2>Paramètres du bot autonome</h2>
+                <form action="{{ url_for('dql_trader')}}" method="POST">
+                  {{ BotDqlForm.time_trade.label() }}
+                  {{ BotDqlForm.time_trade }}
+                    {{ BotDqlForm.model_name.label() }}
+                  {{ BotDqlForm.model_name }}
+
+                  {{ BotDqlForm.submit }}
+                </form>
+            </div>
         </div>
 
         <!-- Tableau des actions précédentes -->

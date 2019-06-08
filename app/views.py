@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template
-from app.forms import TrainForm, BotForm
+from app.forms import TrainForm, BotForm, BotDqlForm
 from app.models import TrainHistory, StockHistory, StockPrediction, Asset, BotAction
 from app.utils.fxcmManager import connect_fxcm
 
@@ -54,9 +54,10 @@ def stock_history():
 @app.route('/bot')
 def bot():
     form = BotForm()
+    formdql = BotDqlForm()
     models = TrainHistory.query.all()
     bot_actions = BotAction.query.all()
-    return render_template('bot.html', botform=form, models=models, bot_actions=bot_actions)
+    return render_template('bot.html', botform=form, BotDqlForm=formdql, models=models, bot_actions=bot_actions)
 
 
 @app.route('/liste-indices')

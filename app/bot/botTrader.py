@@ -40,7 +40,7 @@ def take_position(model_id=17, asset_id=1, period='H1'):
     if cot.bidclose < cot.bidopen:
         #order = con_fxcmpy.create_market_sell_order('GER30', 5)
 
-        order = con_fxcmpy.open_trade(symbol=asset.name, is_buy=False,
+        con_fxcmpy.open_trade(symbol=asset.name, is_buy=False,
                        is_in_pips=False,
                        amount='5', time_in_force='GTC',
                        order_type='AtMarket', limit=cot.bidlow, stop=cot.bidhigh)
@@ -50,8 +50,6 @@ def take_position(model_id=17, asset_id=1, period='H1'):
 
 
     open_position = con_fxcmpy.get_open_positions()
-    print(order)
-    print(open_position)
 
     return open_position
 

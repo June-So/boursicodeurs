@@ -1,6 +1,7 @@
 from app import app
 from flask import request, flash, redirect, url_for
 from app.bot.botTrader import take_position
+from app.bot.qTrader.realtime import agent_playing
 from app.utils.fxcmManager import connect_fxcm
 from app.models import BotAction
 import time
@@ -43,4 +44,17 @@ def free_trader():
                 #tradeId = position['tradeId'][0]
                 #con_fxcmpy.close_all()
             time_trade = time_trade-1
+    return redirect(url_for('bot'))
+
+
+@app.route('/dql-trader', methods = ["POST", "GET"])
+def dql_trader():
+    if request.method == 'POST':
+        time_trade = request.form['time_trade']
+        model_name = request.form['model_name']
+        time_trade = int(time_trade)
+        while time_trade > 0 :
+            agent_playing(model_name=model_name)
+            time_trade -= 1
+
     return redirect(url_for('bot'))
