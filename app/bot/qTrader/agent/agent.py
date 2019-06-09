@@ -27,7 +27,7 @@ class Agent:
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
 
-        self.model = load_model("app/bot/qTrader/models/" + model_name +"") if is_eval else self._model()
+        self.model = load_model("app/bot/qTrader/models/weights/" + model_name) if is_eval else self._model()
 
     def _model(self):
         model = Sequential()
@@ -70,7 +70,7 @@ class Agent:
     def save(self, name):
         self.model.save_weights(name)
 
-    def take_position(self, action, model_id=17, asset_id=1, period='H1'):
+    def take_position(self, action, model_id=13, asset_id=1, period='H1'):
         STATE_BUY = 1
         STATE_SELL = 2
         STATE_NONE = 0
