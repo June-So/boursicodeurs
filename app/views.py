@@ -5,7 +5,7 @@ from app.models import TrainHistory, StockHistory, StockPrediction, Asset, BotAc
 from app.utils.fxcmManager import connect_fxcm
 
 import matplotlib.pyplot as plt
-
+import os
 
 @app.route('/')
 def index():
