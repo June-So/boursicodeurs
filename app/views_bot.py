@@ -3,10 +3,15 @@ from flask import request, flash, redirect, url_for
 from app.bot.botTrader import take_position
 from app.bot.qTrader.realtime import agent_playing
 from app.utils.fxcmManager import connect_fxcm
+from app.bot.qTrader.agent.agent import Agent
+from keras.models import load_model
 from app.models import BotAction
+from keras import backend as K
 import time
 import datetime as dt
+import pickle
 
+timestamp = time.strftime('%Y%m%d%H%M')
 
 @app.route('/buy-sell', methods=['GET', 'POST'])
 def buy_sell():
@@ -53,8 +58,32 @@ def dql_trader():
         time_trade = request.form['time_trade']
         model_name = request.form['model_name']
         time_trade = int(time_trade)
+
+        #model = load_model("app/bot/qTrader/models/weights/" + model_name)
+        #window_size = model.layers[0].input.shape.as_list()[1]
+        #agent = Agent(window_size, True, model_name)
+
+        portfolio = []
+        memo_recap = []
+        open_position_recap = []
+
         while time_trade > 0 :
-            agent_playing(model_name=model_name)
+
+            portf, memo, open_pos = agent_playing(model_name)
+            portfolio.append(portf)
+            memo_recap.append(memo)
+            open_position_recap.append(open_pos)
+
             time_trade -= 1
+
+
+        with open('app/bot/qTrader/portfolio/wallet_at_{}.p'.format(timestamp), 'wb') as fp:
+            pickle.dump(portfolio, fp)
+
+        with open('app/bot/qTrader/portfolio/memory_at_{}.p'.format(timestamp), 'wb') as fp:
+            pickle.dump(memo_recap, fp)
+
+        with open('app/bot/qTrader/portfolio/open_position_at_{}.p'.format(timestamp), 'wb') as fp:
+            pickle.dump(open_position_recap, fp)
 
     return redirect(url_for('bot'))

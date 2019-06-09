@@ -2,9 +2,15 @@ from app import app
 import app.utils.ScriptModel as script_model
 from keras.models import load_model
 from app.bot.qTrader.agent.agent import Agent
+import pickle
+#from app.bot.qTrader.agent import Agent
+
+from keras import backend as K
 from app.bot.qTrader.functions import *
 import time
+import datetime as dt
 from app.utils.fxcmManager import connect_fxcm
+
 
 STATE_BUY = 1
 STATE_SELL = 2
@@ -13,10 +19,12 @@ STATE_NONE = 3
 
 def agent_playing(model_name, col="askclose"):
 
-    model = load_model("app/bot/qTrader/weights/" + model_name)
+    model = load_model("app/bot/qTrader/models/weights/" + model_name)
+
     window_size = model.layers[0].input.shape.as_list()[1]
 
     agent = Agent(window_size, True, model_name)
+
     data = getLastCotationVect("ger30", "h1", col)
     #batch_size = 32
 
@@ -30,19 +38,19 @@ def agent_playing(model_name, col="askclose"):
     reward = 0
 
     minute_actual = dt.datetime.now().time().minute
-    minute_remain = minute_actual % 60
+    minute_remain = minute_actual % 3
     con_fxcmpy = connect_fxcm()
 
     if minute_remain == 0:
-        agent.take_position(action)
-        time.sleep(3600)
+        open_pos = agent.take_position(action)
+        time.sleep(180)
         con_fxcmpy.close_all()
 
     else:
         sec_remain = (minute_remain) * 60
-        minute_remain = 3600 - sec_remain
+        minute_remain = 180 - sec_remain
 
-        agent.take_position(action)
+        open_pos = agent.take_position(action)
         time.sleep(minute_remain)
         con_fxcmpy.close_all()
 
@@ -50,7 +58,7 @@ def agent_playing(model_name, col="askclose"):
 
     if action == 1:  # buy
         reward = max(data[-1] - data[-2], 0)
-        agent.portfolio += data[-1] - data[-2]
+        agent.portfolio.append(data[-1] - data[-2])
 
     if action == 2:  # sell
         reward = max(-(data[-1] - data[-2]), 0)
@@ -59,3 +67,6 @@ def agent_playing(model_name, col="askclose"):
     next_state = getState(data, window_size - 1, window_size + 1)
 
     agent.memory.append((state, action, reward, next_state))
+
+    return (agent.portfolio, agent.memory, open_pos)
+
