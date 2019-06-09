@@ -13,7 +13,7 @@ STATE_NONE = 3
 
 def agent_playing(model_name, col="askclose"):
 
-    model = load_model("models/" + model_name +".h5")
+    model = load_model("app/bot/qTrader/weights/" + model_name)
     window_size = model.layers[0].input.shape.as_list()[1]
 
     agent = Agent(window_size, True, model_name)
