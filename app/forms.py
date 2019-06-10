@@ -17,7 +17,7 @@ class BotForm(FlaskForm):
 
 class BotDqlForm(FlaskForm):
     time_trade = IntegerField('time trade')
-    model_name = StringField('nom model')
-    FILENAMES = [(name, name) for i, name in enumerate(os.listdir('app/bot/qTrader/models/'))]
+    FILENAMES = [(name, name) for i, name in enumerate(os.listdir('app/bot/qTrader/models/weights'))]
     model_name = SelectField(u'nom model', choices=FILENAMES)
+    time_horizon = StringField('time horizon')
     submit = SubmitField("Lancer le DqlTrader")
