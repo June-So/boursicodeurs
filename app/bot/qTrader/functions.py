@@ -15,20 +15,22 @@ def getStockDataVec(key):
 
     return vec
 
-def getLastCotation(instrument, period):
+def getLastCotation(instrument, period, window_size):
     
     instrument = instrument.upper()
-    period = period.upper()
+    #period = period.upper()
+
+    period = period.lower()
     con_fxcmpy = connect_fxcm()
 
-    df = con_fxcmpy.get_candles(instrument, period=period, number=20)
+    df = con_fxcmpy.get_candles(instrument, period=period, number=window_size)
     df.head()
     return df
 
 
-def getLastCotationVect(instrument, period, col):
+def getLastCotationVect(instrument, period, window_size, col):
     
-    df = getLastCotation(instrument, period)
+    df = getLastCotation(instrument, period, window_size)
     vec = df[col].values.tolist()
         
     return vec

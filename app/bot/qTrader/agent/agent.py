@@ -98,7 +98,7 @@ class Agent:
             order = con_fxcmpy.open_trade(symbol=asset.name, is_buy=True,
                            is_in_pips=False,
                            amount='5', time_in_force='GTC',
-                           order_type='AtMarket', limit=cot.askhigh, stop=cot.asklow)
+                           order_type='AtMarket', stop=cot.asklow)
             save_action(STATE_BUY, cot)
 
         # Condition de ???
@@ -106,7 +106,7 @@ class Agent:
             con_fxcmpy.open_trade(symbol=asset.name, is_buy=False,
                            is_in_pips=False,
                            amount='5', time_in_force='GTC',
-                           order_type='AtMarket', limit=cot.bidlow, stop=cot.bidhigh)
+                           order_type='AtMarket', stop=cot.bidhigh)
             save_action(STATE_SELL, cot)
 
         if action == STATE_NONE:
@@ -116,4 +116,4 @@ class Agent:
 
         open_position = con_fxcmpy.get_open_positions()
 
-        return open_position
+        return (open_position, cot)

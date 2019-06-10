@@ -18,4 +18,5 @@ class BotForm(FlaskForm):
 class BotDqlForm(FlaskForm):
     time_trade = IntegerField('time trade')
     model_name = TextField('nom model')
+    time_horizon = TextField('time horizon')
     submit = SubmitField("Lancer le DqlTrader")
