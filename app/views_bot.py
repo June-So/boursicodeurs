@@ -57,6 +57,7 @@ def dql_trader():
     if request.method == 'POST':
         time_trade = request.form['time_trade']
         model_name = request.form['model_name']
+        time_horizon = request.form['time_horizon']
         time_trade = int(time_trade)
 
         #model = load_model("app/bot/qTrader/models/weights/" + model_name)
@@ -66,13 +67,15 @@ def dql_trader():
         portfolio = []
         memo_recap = []
         open_position_recap = []
+        lstm_prediction = []
 
         while time_trade > 0 :
 
-            portf, memo, open_pos = agent_playing(model_name)
+            portf, memo, open_pos, cot_lstm = agent_playing(model_name, time_horizon)
             portfolio.append(portf)
             memo_recap.append(memo)
             open_position_recap.append(open_pos)
+            lstm_prediction.append(cot_lstm)
 
             time_trade -= 1
 
@@ -80,10 +83,13 @@ def dql_trader():
         with open('app/bot/qTrader/portfolio/wallet_at_{}.p'.format(timestamp), 'wb') as fp:
             pickle.dump(portfolio, fp)
 
-        with open('app/bot/qTrader/portfolio/memory_at_{}.p'.format(timestamp), 'wb') as fp:
-            pickle.dump(memo_recap, fp)
+        with open('app/bot/qTrader/portfolio/memory_at_{}.p'.format(timestamp), 'wb') as fm:
+            pickle.dump(memo_recap, fm)
 
-        with open('app/bot/qTrader/portfolio/open_position_at_{}.p'.format(timestamp), 'wb') as fp:
-            pickle.dump(open_position_recap, fp)
+        with open('app/bot/qTrader/portfolio/open_position_at_{}.p'.format(timestamp), 'wb') as fo:
+            pickle.dump(open_position_recap, fo)
+
+        with open('app/bot/qTrader/portfolio/lstm_prediction_at_{}.p'.format(timestamp), 'wb') as fl:
+            pickle.dump(lstm_prediction, fl)
 
     return redirect(url_for('bot'))

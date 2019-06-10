@@ -17,15 +17,17 @@ STATE_SELL = 2
 STATE_NONE = 3
 
 
-def agent_playing(model_name, col="askclose"):
+def agent_playing(model_name,time_horizon, col="askclose"):
 
     model = load_model("app/bot/qTrader/models/weights/" + model_name)
 
     window_size = model.layers[0].input.shape.as_list()[1]
 
+    period = time_horizon
+
     agent = Agent(window_size, True, model_name)
 
-    data = getLastCotationVect("ger30", "h1", col)
+    data = getLastCotationVect("ger30", period, window_size, col)
     #batch_size = 32
 
 
@@ -38,23 +40,23 @@ def agent_playing(model_name, col="askclose"):
     reward = 0
 
     minute_actual = dt.datetime.now().time().minute
-    minute_remain = minute_actual % 3
+    minute_remain = minute_actual % 5
     con_fxcmpy = connect_fxcm()
 
     if minute_remain == 0:
-        open_pos = agent.take_position(action)
-        time.sleep(180)
+        open_pos, cot_lstm = agent.take_position(action)
+        time.sleep(300)
         con_fxcmpy.close_all()
 
     else:
         sec_remain = (minute_remain) * 60
-        minute_remain = 180 - sec_remain
+        minute_remain = 300 - sec_remain
 
-        open_pos = agent.take_position(action)
+        open_pos, cot_lstm = agent.take_position(action)
         time.sleep(minute_remain)
         con_fxcmpy.close_all()
 
-    data = getLastCotationVect("ger30", "h1", col)
+    data = getLastCotationVect("ger30", period, window_size, col)
 
     if action == 1:  # buy
         reward = max(data[-1] - data[-2], 0)
@@ -68,5 +70,5 @@ def agent_playing(model_name, col="askclose"):
 
     agent.memory.append((state, action, reward, next_state))
 
-    return (agent.portfolio, agent.memory, open_pos)
+    return (agent.portfolio, agent.memory, open_pos, cot_lstm)
 
